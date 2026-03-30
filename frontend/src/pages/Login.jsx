@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API = 'https://san-isidro-digital.onrender.com/api'
 
 export default function Login() {
   const [email, setEmail] = useState('')
