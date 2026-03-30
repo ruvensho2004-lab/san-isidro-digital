@@ -35,12 +35,7 @@ export default function Dashboard() {
     { icon: '🏘', title: 'Proyectos', desc: 'Mejorar la comunidad', color: 'rgba(52,211,153,0.5)', to: '/proyectos' },
   ]
 
-  if (loading) return <div style={s.loading}>Cargando...</div>
-  if (error) return <div style={s.error}>Error: {error}</div>
-
-  const getVal = (key) => stats?.[key] ?? 0
-
-  const s = {
+  const styles = {
     loading: { color: '#a89fc7', textAlign: 'center', padding: 40 },
     error: { color: '#f87171', textAlign: 'center', padding: 40 },
     statsGrid: { display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 10 : 16, marginBottom: 24 },
@@ -63,44 +58,49 @@ export default function Dashboard() {
     impactVal: { fontSize: 13, fontWeight: 700, fontFamily: 'monospace' },
   }
 
+  if (loading) return <div style={styles.loading}>Cargando...</div>
+  if (error) return <div style={styles.error}>Error: {error}</div>
+
+  const getVal = (key) => stats?.[key] ?? 0
+
   return (
     <div>
-      <div style={s.statsGrid}>
+      <div style={styles.statsGrid}>
         {cards.map((c, i) => (
-          <div key={i} style={s.statCard}>
-            <div style={s.statLabel}>{c.label}</div>
-            <div style={s.statRow}>
-              <div style={{ ...s.statNum, color: c.color }}>{getVal(c.key)}</div>
-              <div style={s.statBadge}>{c.badge}</div>
+          <div key={i} style={styles.statCard}>
+            <div style={styles.statLabel}>{c.label}</div>
+            <div style={styles.statRow}>
+              <div style={{ ...styles.statNum, color: c.color }}>{getVal(c.key)}</div>
+              <div style={styles.statBadge}>{c.badge}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={s.modulesGrid}>
+      <div style={styles.modulesGrid}>
         {modules.map((m, i) => (
-          <Link key={i} to={m.to} style={s.moduleCard}>
-            <div style={{ ...s.moduleIcon, background: `${m.color}22` }}>{m.icon}</div>
-            <div style={s.moduleTitle}>{m.title}</div>
-            <div style={s.moduleDesc}>{m.desc}</div>
+          <Link key={i} to={m.to} style={styles.moduleCard}>
+            <div style={{ ...styles.moduleIcon, background: `${m.color}22` }}>{m.icon}</div>
+            <div style={styles.moduleTitle}>{m.title}</div>
+            <div style={styles.moduleDesc}>{m.desc}</div>
           </Link>
         ))}
       </div>
 
-      <div style={s.bottomGrid}>
-        <div style={s.panel}>
-          <div style={s.panelTitle}>Actividad Reciente</div>
-          <div style={s.empty}>Sin actividad reciente</div>
+      <div style={styles.bottomGrid}>
+        <div style={styles.panel}>
+          <div style={styles.panelTitle}>Actividad Reciente</div>
+          <div style={styles.empty}>Sin actividad reciente</div>
         </div>
-        <div style={s.panel}>
-          <div style={s.panelTitle}>Indicadores de Impacto</div>
-          <div style={s.impactRow}>
-            <div style={s.impactLabel}>Beneficiarios Totales</div>
-            <div style={{ ...s.impactVal, color: '#38bdf8' }}>{getVal('beneficiarios')}</div>
+        <div style={styles.panel}>
+          <div style={styles.panelTitle}>Indicadores de Impacto</div>
+          <div style={styles.impactRow}>
+            <div style={styles.impactLabel}>Beneficiarios Totales</div>
+            <div style={{ ...styles.impactVal, color: '#38bdf8' }}>{getVal('beneficiarios')}</div>
           </div>
-          <div style={s.impactRow}>
-            <div style={s.impactLabel}>Inversión</div>
-            <div style={{ ...s.impactVal, color: '#fbbf24' }}>${getVal('inversionTotal') || 0}</div>
+          <div style={styles.impactRow}>
+            <div style={styles.impactLabel}>Inversión</div>
+            <div style={{ ...styles.impactVal, color: '#fbbf24' }}>${getVal('inversionTotal') || 0}</div>
           </div>
         </div>
       </div>
