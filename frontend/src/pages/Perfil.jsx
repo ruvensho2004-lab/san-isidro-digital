@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { api } from '../services/api'
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+
 export default function Perfil() {
   const { user, login } = useAuth()
   const [password, setPassword] = useState('')
@@ -23,7 +25,7 @@ export default function Perfil() {
     }
     setLoading(true)
     try {
-      await fetch('http://localhost:3001/api/auth/cambiar-password', {
+      await fetch(`${API}/auth/cambiar-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         body: JSON.stringify({ password })
