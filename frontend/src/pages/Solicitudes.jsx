@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react'
 import { api } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { exportToExcel, exportToPDF } from '../utils/export'
 
 const TIPOS = ['Trámite Administrativo', 'Ayuda Social', 'Reclamo de Servicio', 'Información General', 'Proyecto de Mejora']
 const ESTADOS = { 'Pendiente': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' }, 'En Proceso': { bg: 'rgba(56,189,248,0.15)', color: '#38bdf8' }, 'Resuelto': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' } }
+
+const columnas = [
+  { header: '#', accessor: (_, i) => i + 1 },
+  { header: 'Ciudadano', accessor: item => item.nombre },
+  { header: 'Tipo', accessor: item => item.tipo },
+  { header: 'Descripción', accessor: item => item.descripcion },
+  { header: 'Estado', accessor: item => item.estado },
+  { header: 'Fecha', accessor: item => new Date(item.fecha).toLocaleDateString() },
+]
 
 export default function Solicitudes() {
   const [solicitudes, setSolicitudes] = useState([])
@@ -11,15 +21,7 @@ export default function Solicitudes() {
   const [mostrarForm, setMostrarForm] = useState(false)
   const [notif, setNotif] = useState('')
   const [form, setForm] = useState({ nombre: '', telefono: '', tipo: 'Trámite Administrativo', descripcion: '' })
-  const [isMobile, setIsMobile] = useState(false)
   const { isAdmin } = useAuth()
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   useEffect(() => { fetchData() }, [])
 
@@ -63,30 +65,25 @@ export default function Solicitudes() {
 
   function mostrarNotif(msg) { setNotif(msg); setTimeout(() => setNotif(''), 3000) }
 
-  const s = {
-    header: { display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', marginBottom: 20, gap: isMobile ? 12 : 0 },
-    titulo: { fontSize: isMobile ? 16 : 18, fontWeight: 700, color: '#e8e4ff' },
-    btnPrimary: { background: 'linear-gradient(135deg,#7c5cfc,#4f3bb8)', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontFamily: "'Sora', sans-serif", fontSize: isMobile ? 12 : 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 16px rgba(124,92,252,0.3)' },
-    panel: { background: '#1e1a3a', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 16, padding: isMobile ? 14 : 22, marginBottom: 16, overflowX: 'auto' },
-    panelTitle: { fontSize: 14, fontWeight: 700, color: '#e8e4ff', marginBottom: 16 },
-    formRow: { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 0 : 16 },
-    formGroup: { marginBottom: isMobile ? 12 : 16 },
-    label: { display: 'block', fontSize: 10, fontWeight: 600, color: '#a89fc7', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
-    input: { width: '100%', background: '#1a1638', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 10, color: '#e8e4ff', fontFamily: "'Sora', sans-serif", fontSize: 13, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' },
-    table: { width: '100%', borderCollapse: 'collapse', fontSize: isMobile ? 11 : 13, minWidth: isMobile ? 500 : 'auto' },
-    th: { textAlign: 'left', padding: isMobile ? '8px 6px' : '10px 14px', color: '#6b61a0', fontSize: isMobile ? 8 : 10, textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid rgba(120,100,255,0.18)', whiteSpace: 'nowrap' },
-    td: { padding: isMobile ? '10px 6px' : '12px 14px', color: '#e8e4ff', borderBottom: '1px solid rgba(120,100,255,0.06)', fontSize: isMobile ? 11 : 13 },
-    tag: { padding: '4px 8px', borderRadius: 6, fontSize: isMobile ? 9 : 11, fontWeight: 600, border: 'none', cursor: 'pointer' },
-    btnDelete: { background: 'transparent', border: 'none', cursor: 'pointer', fontSize: isMobile ? 14 : 16 },
-    empty: { textAlign: 'center', color: '#6b61a0', padding: isMobile ? 20 : 30, fontSize: isMobile ? 12 : 13 },
-    notif: { position: 'fixed', bottom: isMobile ? 80 : 24, left: isMobile ? 16 : 'auto', right: isMobile ? 16 : 24, background: '#252048', border: '1px solid #7c5cfc', borderRadius: 12, padding: '14px 18px', fontSize: 13, color: '#e8e4ff', zIndex: 9999 },
+  function handleExportExcel() {
+    exportToExcel(solicitudes, 'solicitudes', columnas)
+    mostrarNotif('✅ Descargando Excel...')
+  }
+
+  function handleExportPDF() {
+    exportToPDF(solicitudes, 'solicitudes', columnas, 'Reporte de Solicitudes')
+    mostrarNotif('✅ Descargando PDF...')
   }
 
   return (
     <div>
       <div style={s.header}>
         <h2 style={s.titulo}>📋 Solicitudes</h2>
-        {isAdmin && <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Nueva</button>}
+        <div style={s.actions}>
+          <button style={s.btnExport} onClick={handleExportExcel}>📊 Excel</button>
+          <button style={s.btnExport} onClick={handleExportPDF}>📄 PDF</button>
+          {isAdmin && <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Nueva</button>}
+        </div>
       </div>
 
       {mostrarForm && isAdmin && (
@@ -147,4 +144,25 @@ export default function Solicitudes() {
       {notif && <div style={s.notif}>{notif}</div>}
     </div>
   )
+}
+
+const s = {
+  header: { display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 12, marginBottom: 20 },
+  titulo: { fontSize: 18, fontWeight: 700, color: '#e8e4ff' },
+  actions: { display: 'flex', gap: 8, flexWrap: 'wrap' },
+  btnPrimary: { background: 'linear-gradient(135deg,#7c5cfc,#4f3bb8)', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 16px rgba(124,92,252,0.3)' },
+  btnExport: { background: 'rgba(52,211,153,0.15)', color: '#34d399', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+  panel: { background: '#1e1a3a', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 16, padding: 22, marginBottom: 16, overflowX: 'auto' },
+  panelTitle: { fontSize: 14, fontWeight: 700, color: '#e8e4ff', marginBottom: 16 },
+  formRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 },
+  formGroup: { marginBottom: 16 },
+  label: { display: 'block', fontSize: 10, fontWeight: 600, color: '#a89fc7', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
+  input: { width: '100%', background: '#1a1638', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 10, color: '#e8e4ff', fontSize: 13, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' },
+  table: { width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 500 },
+  th: { textAlign: 'left', padding: '10px 14px', color: '#6b61a0', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid rgba(120,100,255,0.18)', whiteSpace: 'nowrap' },
+  td: { padding: '12px 14px', color: '#e8e4ff', borderBottom: '1px solid rgba(120,100,255,0.06)', fontSize: 13 },
+  tag: { padding: '4px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer' },
+  btnDelete: { background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 16 },
+  empty: { textAlign: 'center', color: '#6b61a0', padding: 30 },
+  notif: { position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: '#252048', border: '1px solid #7c5cfc', borderRadius: 12, padding: '14px 18px', fontSize: 13, color: '#e8e4ff', zIndex: 9999 },
 }
