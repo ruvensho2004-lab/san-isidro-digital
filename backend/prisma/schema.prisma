@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Solicitud {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  telefono    String?
+  tipo        String
+  descripcion String
+  estado      String   @default("Pendiente")
+  fecha       DateTime @default(now())
+  actualizado DateTime @updatedAt
+}
+
+model RecursoClap {
+  id           Int      @id @default(autoincrement())
+  nombre       String
+  cedula       String
+  tipo         String
+  cantidad     Int      @default(1)
+  observaciones String?
+  fecha        DateTime @default(now())
+  actualizado  DateTime @updatedAt
+}
+
+model Emprendimiento {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  responsable String
+  categoria   String
+  descripcion String
+  estado      String   @default("Activo")
+  inversion   Decimal?
+  fecha       DateTime @default(now())
+  actualizado DateTime @updatedAt
+}
+
+model Proyecto {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descripcion String
+  tipo        String
+  sector      String
+  estado      String   @default("En Planificación")
+  fecha       DateTime @default(now())
+  actualizado DateTime @updatedAt
+}
+
+model Beneficiario {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  cedula      String   @unique
+  telefono    String?
+  direccion   String?
+  fecha       DateTime @default(now())
+  actualizado DateTime @updatedAt
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  rol       String   @default("usuario")
+  cedula    String   @unique
+  nombre    String
+  apellido  String?
+  telefono  String?
+  direccion String?
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
