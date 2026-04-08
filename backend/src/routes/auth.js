@@ -3,6 +3,30 @@ import { signToken, hashPassword, comparePassword, authMiddleware } from '../mid
 
 const router = Router()
 
+// Seed admin user
+router.post('/seed-admin', async (req, res) => {
+  try {
+    const email = 'admin@sanisidro.gob.ve'
+    const password = 'admin123'
+    const nombre = 'Administrador'
+    const rol = 'administrador'
+    const cedula = 'V-00000000'
+
+    const existing = await req.prisma.usuario.findUnique({ where: { email } })
+    if (existing) {
+      return res.json({ message: 'Usuario admin ya existe', email })
+    }
+
+    const hashed = await hashPassword(password)
+    const user = await req.prisma.usuario.create({
+      data: { email, password: hashed, nombre, rol, cedula, activo: true }
+    })
+    res.json({ message: 'Usuario admin creado', email })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 router.post('/register', async (req, res) => {
   try {
     const { email, password, rol, cedula, nombre, apellido, telefono, direccion } = req.body
