@@ -18,6 +18,9 @@ const prisma = new PrismaClient()
 app.use(cors())
 app.use(express.json())
 
+// Test route
+app.get('/api/test', (req, res) => res.json({ok: true}))
+
 // Seed admin user on startup
 ;(async () => {
   try {
