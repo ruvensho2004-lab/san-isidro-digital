@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import bcrypt from 'bcryptjs'
 import { PrismaClient } from '@prisma/client'
 import { authMiddleware, adminOnly } from './middleware/auth.js'
 import authRouter from './routes/auth.js'
@@ -16,6 +17,20 @@ const prisma = new PrismaClient()
 
 app.use(cors())
 app.use(express.json())
+
+// Seed admin user on startup
+;(async () => {
+  try {
+    const existing = await prisma.usuario.findUnique({ where: { email: 'admin@sanisidro.gob.ve' } })
+    if (!existing) {
+      const hashed = await bcrypt.hash('admin123', 10)
+      await prisma.usuario.create({
+        data: { email: 'admin@sanisidro.gob.ve', password: hashed, nombre: 'Administrador', rol: 'administrador', cedula: 'V-00000000', activo: true }
+      })
+      console.log('✅ Admin user created')
+    }
+  } catch(e) { console.log('Admin seed:', e.message) }
+})()
 
 app.use((req, res, next) => {
   req.prisma = prisma
