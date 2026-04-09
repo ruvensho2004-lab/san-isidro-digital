@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>San Isidro Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0d0b1a; --card: #1e1a3a; --card2: #252048; --border: rgba(120,100,255,0.18); --accent: #7c5cfc; --accent2: #a78bfa; --accent3: #38bdf8; --accent4: #f472b6; --accent5: #34d399; --text: #e8e4ff; --text2: #a89fc7; --text3: #6b61a0; --glow: rgba(124,92,252,0.3); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; font-family:'Sora',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; }
+  .login-screen { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:9999; }
+  .login-box { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:40px; width:100%; max-width:400px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+  .login-logo { width:60px; height:60px; background:linear-gradient(135deg,var(--accent),#4f3bb8); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:28px; }
+  .login-title { font-size:24px; font-weight:700; margin-bottom:8px; }
+  .login-sub { font-size:13px; color:var(--text2); margin-bottom:30px; }
+  .login-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; padding:14px 16px; outline:none; margin-bottom:12px; }
+  .login-input:focus { border-color:var(--accent); }
+  .login-select { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; padding:14px 16px; outline:none; margin-bottom:12px; }
+  .login-btn { width:100%; background:linear-gradient(135deg,var(--accent),#4f3bb8); color:#fff; border:none; border-radius:10px; padding:14px; font-size:14px; font-weight:600; cursor:pointer; margin-top:10px; box-shadow:0 4px 20px var(--glow); }
+  .login-error { color:var(--accent4); font-size:12px; margin-top:10px; display:none; }
+  .shell { display:flex; height:100vh; }
+  .hidden { display:none !important; }
+  .sidebar { width:260px; background:linear-gradient(180deg,#1a1040 0%,#0d0b1a 100%); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; position:relative; }
+  .sidebar::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent3)); }
+  .logo-area { padding:24px 20px 20px; border-bottom:1px solid var(--border); }
+  .logo-badge { display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,var(--accent),#4f3bb8); border-radius:12px; padding:10px 14px; margin-bottom:12px; }
+  .logo-title { font-size:14px; font-weight:700; color:#fff; }
+  .logo-sub { font-size:10px; color:rgba(255,255,255,0.6); }
+  .nav-section { padding:16px 12px 8px; }
+  .nav-label { font-size:9px; font-weight:600; color:var(--text3); letter-spacing:2px; text-transform:uppercase; padding:0 8px; margin-bottom:8px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; transition:all .2s; color:var(--text2); font-size:12.5px; font-weight:500; position:relative; }
+  .nav-item:hover { background:rgba(124,92,252,0.12); color:var(--text); }
+  .nav-item.active { background:linear-gradient(90deg,rgba(124,92,252,0.25),rgba(124,92,252,0.05)); color:var(--accent2); }
+  .nav-item.active::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:3px; border-radius:0 2px 2px 0; background:var(--accent); }
+  .sidebar-footer { margin-top:auto; padding:16px; display:flex; gap:8px; }
+  .asistente-btn { flex:1; padding:12px; border-radius:12px; border:none; cursor:pointer; background:linear-gradient(135deg,var(--accent),var(--accent3)); color:#fff; font-size:13px; font-weight:600; }
+  .logout-btn { padding:12px; border-radius:12px; border:none; cursor:pointer; background:rgba(244,114,182,0.2); color:var(--accent4); font-size:18px; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .topbar { padding:18px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); flex-shrink:0; background:rgba(13,11,26,0.8); }
+  .page-title { font-size:22px; font-weight:700; }
+  .page-sub { font-size:12px; color:var(--text2); margin-top:2px; }
+  .topbar-right { display:flex; align-items:center; gap:12px; }
+  .user-pill { background:var(--card); border:1px solid var(--border); color:var(--text2); font-size:12px; padding:6px 14px; border-radius:20px; }
+  .status-pill { background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.3); color:var(--accent5); font-size:11px; font-weight:600; padding:4px 12px; border-radius:20px; display:flex; align-items:center; gap:6px; }
+  .status-dot { width:6px; height:6px; border-radius:50%; background:var(--accent5); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .content { flex:1; overflow-y:auto; padding:24px 28px; }
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .stat-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; }
+  .stat-label { font-size:11px; color:var(--text2); font-weight:500; text-transform:uppercase; margin-bottom:12px; }
+  .stat-num { font-size:32px; font-weight:700; font-family:'Space Mono',monospace; }
+  .stat-card:nth-child(1) .stat-num { color:var(--accent2); }
+  .stat-card:nth-child(2) .stat-num { color:var(--accent3); }
+  .stat-card:nth-child(3) .stat-num { color:var(--accent4); }
+  .stat-card:nth-child(4) .stat-num { color:var(--accent5); }
+  .stat-badge { font-size:10px; padding:3px 8px; border-radius:6px; font-weight:600; }
+  .badge-activo { background:rgba(52,211,153,0.15); color:var(--accent5); }
+  .badge-total { background:rgba(167,139,250,0.15); color:var(--accent2); }
+  .section-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+  .module-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px; cursor:pointer; transition:all .25s; }
+  .module-card:hover { transform:translateY(-3px); }
+  .module-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; font-size:20px; }
+  .icon-purple { background:rgba(124,92,252,0.2); }
+  .icon-pink { background:rgba(244,114,182,0.2); }
+  .icon-green { background:rgba(52,211,153,0.2); }
+  .module-title { font-size:15px; font-weight:700; margin-bottom:6px; }
+  .module-desc { font-size:12px; color:var(--text2); margin-bottom:16px; }
+  .module-count { font-size:24px; font-weight:700; font-family:'Space Mono',monospace; color:var(--accent2); }
+  .module-link { font-size:11px; color:var(--accent); font-weight:600; }
+  .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px; }
+  .panel-title { font-size:14px; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .panel-title::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); }
+  .view { display:none; }
+  .view.active { display:block; }
+  .form-wrap { max-width:640px; }
+  .form-group { margin-bottom:18px; }
+  .form-group label { display:block; font-size:12px; font-weight:600; color:var(--text2); text-transform:uppercase; margin-bottom:8px; }
+  .form-group input, .form-group select, .form-group textarea { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:13px; padding:12px 14px; outline:none; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#4f3bb8); color:#fff; border:none; border-radius:10px; padding:12px 28px; font-size:13px; font-weight:600; cursor:pointer; }
+  .btn-secondary { background:rgba(167,139,250,0.15); color:var(--accent2); border:none; border-radius:10px; padding:12px 20px; font-size:13px; font-weight:600; cursor:pointer; }
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; padding:10px 14px; color:var(--text3); font-size:10px; text-transform:uppercase; border-bottom:1px solid var(--border); }
+  td { padding:12px 14px; border-bottom:1px solid rgba(120,100,255,0.08); }
+  tr:hover td { background:rgba(124,92,252,0.05); }
+  .tag { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:600; }
+  .tag-p { background:rgba(251,191,36,0.15); color:#fbbf24; }
+  .tag-a { background:rgba(52,211,153,0.15); color:var(--accent5); }
+  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+  .section-header h2 { font-size:18px; font-weight:700; }
+  .header-actions { display:flex; gap:8px; }
+  .chat-wrap { display:flex; flex-direction:column; height:calc(100vh - 130px); }
+  .chat-messages { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:16px; }
+  .msg { display:flex; gap:10px; max-width:85%; }
+  .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+  .msg-avatar { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .avatar-ai { background:linear-gradient(135deg,var(--accent),var(--accent3)); }
+  .avatar-user { background:var(--card2); }
+  .msg-bubble { padding:12px 16px; border-radius:14px; font-size:13px; }
+  .msg.ai .msg-bubble { background:var(--card2); border:1px solid var(--border); border-top-left-radius:4px; }
+  .msg.user .msg-bubble { background:linear-gradient(135deg,var(--accent),#4f3bb8); border-top-right-radius:4px; }
+  .chat-input-row { display:flex; gap:10px; margin-top:12px; }
+  .chat-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:13px; padding:13px 16px; outline:none; }
+  .chat-send { background:linear-gradient(135deg,var(--accent),var(--accent3)); border:none; border-radius:12px; color:#fff; padding:0 20px; cursor:pointer; font-size:18px; }
+  .typing { display:flex; gap:4px; }
+  .typing span { width:6px; height:6px; border-radius:50%; background:var(--accent2); animation:bounce .8s infinite; }
+  .typing span:nth-child(2) { animation-delay:.15s; }
+  .typing span:nth-child(3) { animation-delay:.3s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+  .notif { position:fixed; bottom:24px; right:24px; background:var(--card2); border:1px solid var(--accent); border-radius:12px; padding:14px 18px; font-size:13px; z-index:9999; transform:translateY(100px); opacity:0; transition:all .3s; }
+  .notif.show { transform:translateY(0); opacity:1; }
+  .loading { text-align:center; color:var(--text3); padding:30px; }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">🏛️</div>
+    <div class="login-title">San Isidro Digital</div>
+    <div class="login-sub">Sistema de Atención Comunal</div>
+    <select class="login-select" id="loginRol">
+      <option value="administrador">Administrador</option>
+      <option value="usuario">Usuario</option>
+    </select>
+    <input type="email" class="login-input" id="loginEmail" placeholder="Email">
+    <input type="password" class="login-input" id="loginPass" placeholder="Contraseña">
+    <button class="login-btn" onclick="doLogin()">Iniciar Sesión</button>
+    <div class="login-error" id="loginError">Credenciales inválidas</div>
+  </div>
+</div>
+
+<div class="shell hidden" id="appShell">
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-badge"><span style="font-size:24px">🏛️</span><div class="logo-title">San Isidro<br>Digital</div></div>
+      <div class="logo-sub">Sistema de Atención Comunal</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+      <div class="nav-section">
+        <div class="nav-label">Menú</div>
+        <div class="nav-item active" data-view="dashboard">📊 Dashboard</div>
+        <div class="nav-item" data-view="solicitudes">📋 Solicitudes</div>
+        <div class="nav-item" data-view="recursos">📦 Recursos CLAP</div>
+        <div class="nav-item" data-view="proyectos">🏘 Proyectos</div>
+        <div class="nav-item" data-view="emprendimientos">💡 Emprendimientos</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Más</div>
+        <div class="nav-item" data-view="salud">❤️ Salud</div>
+        <div class="nav-item" data-view="ubicacion">📍 Ubicación</div>
+        <div class="nav-item" data-view="info">ℹ️ Información</div>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="asistente-btn" data-view="chat">✨ IA</button>
+      <button class="logout-btn" onclick="logout()">🚪</button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-sub" id="pageSub">Sistema Integral de Atención Comunal</div>
+      </div>
+      <div class="topbar-right">
+        <div class="user-pill" id="userPill">👤</div>
+        <div class="status-pill" id="backendStatus"><div class="status-dot"></div> Backend Activo</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="view active" id="view-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Solicitudes</div><div class="stat-num" id="cnt-sol">0</div></div>
+          <div class="stat-card"><div class="stat-label">Recursos CLAP</div><div class="stat-num" id="cnt-clap">0</div></div>
+          <div class="stat-card"><div class="stat-label">Emprendimientos</div><div class="stat-num" id="cnt-empr">0</div></div>
+          <div class="stat-card"><div class="stat-label">Proyectos</div><div class="stat-num" id="cnt-proy">0</div></div>
+        </div>
+        <div class="section-grid">
+          <div class="module-card" data-view="solicitudes"><div class="module-icon icon-purple">📋</div><div class="module-title">Solicitudes</div><div class="module-desc">Gestión de peticiones</div><div class="module-count" id="mod-sol">0</div></div>
+          <div class="module-card" data-view="emprendimientos"><div class="module-icon icon-pink">💡</div><div class="module-title">Emprendimientos</div><div class="module-desc">Negocios locales</div><div class="module-count" id="mod-empr">0</div></div>
+          <div class="module-card" data-view="proyectos"><div class="module-icon icon-green">🏘</div><div class="module-title">Proyectos</div><div class="module-desc">Obras comunitarias</div><div class="module-count" id="mod-proy">0</div></div>
+        </div>
+      </div>
+
+      <div class="view" id="view-solicitudes">
+        <div class="section-header"><h2>📋 Solicitudes</h2><div class="header-actions"><button class="btn-secondary" onclick="loadData('solicitudes')">↻</button><button class="btn-primary" onclick="toggleForm('formSolicitud')">+ Nueva</button></div></div>
+        <div id="formSolicitud" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="panel-title">Nueva Solicitud</div><div class="form-group"><label>Nombre</label><input type="text" id="sol-nombre"></div><div class="form-group"><label>Tipo</label><select id="sol-tipo"><option>Trámite</option><option>Ayuda Social</option><option>Reclamo</option></select></div><div class="form-group"><label>Descripción</label><textarea id="sol-desc"></textarea></div><button class="btn-primary" onclick="addData('solicitudes')">Registrar</button></div></div>
+        <div class="panel table-wrap"><table><thead><tr><th>#</th><th>Nombre</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead><tbody id="tablaSolicitudes"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody></table></div>
+      </div>
+
+      <div class="view" id="view-recursos">
+        <div class="section-header"><h2>📦 Recursos CLAP</h2><div class="header-actions"><button class="btn-secondary" onclick="loadData('clap')">↻</button><button class="btn-primary" onclick="toggleForm('formClap')">+ Nuevo</button></div></div>
+        <div id="formClap" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="panel-title">Nuevo Recurso</div><div class="form-group"><label>Beneficiario</label><input type="text" id="clap-nombre"></div><div class="form-group"><label>Tipo</label><select id="clap-tipo"><option>Caja CLAP</option><option>Medicamentos</option></select></div><div class="form-group"><label>Cantidad</label><input type="number" id="clap-cant" value="1"></div><button class="btn-primary" onclick="addData('clap')">Registrar</button></div></div>
+        <div class="panel table-wrap"><table><thead><tr><th>#</th><th>Beneficiario</th><th>Tipo</th><th>Cantidad</th><th>Fecha</th></tr></thead><tbody id="tablaClap"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody></table></div>
+      </div>
+
+      <div class="view" id="view-emprendimientos">
+        <div class="section-header"><h2>💡 Emprendimientos</h2><div class="header-actions"><button class="btn-secondary" onclick="loadData('emprendimientos')">↻</button><button class="btn-primary" onclick="toggleForm('formEmpr')">+ Nuevo</button></div></div>
+        <div id="formEmpr" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="panel-title">Nuevo Emprendimiento</div><div class="form-group"><label>Nombre</label><input type="text" id="empr-nombre"></div><div class="form-group"><label>Responsable</label><input type="text" id="empr-persona"></div><div class="form-group"><label>Categoría</label><select id="empr-cat"><option>Alimentos</option><option>Artesanía</option><option>Servicios</option></select></div><button class="btn-primary" onclick="addData('emprendimientos')">Registrar</button></div></div>
+        <div class="panel table-wrap"><table><thead><tr><th>#</th><th>Nombre</th><th>Responsable</th><th>Categoría</th><th>Estado</th></tr></thead><tbody id="tablaEmpr"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody></table></div>
+      </div>
+
+      <div class="view" id="view-proyectos">
+        <div class="section-header"><h2>🏘 Proyectos</h2><div class="header-actions"><button class="btn-secondary" onclick="loadData('proyectos')">↻</button><button class="btn-primary" onclick="toggleForm('formProy')">+ Nuevo</button></div></div>
+        <div id="formProy" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="panel-title">Nuevo Proyecto</div><div class="form-group"><label>Nombre</label><input type="text" id="proy-nombre"></div><div class="form-group"><label>Sector</label><input type="text" id="proy-sector"></div><div class="form-group"><label>Tipo</label><select id="proy-tipo"><option>Infraestructura</option><option>Ambiente</option><option>Educación</option></select></div><button class="btn-primary" onclick="addData('proyectos')">Registrar</button></div></div>
+        <div class="panel table-wrap"><table><thead><tr><th>#</th><th>Nombre</th><th>Sector</th><th>Tipo</th><th>Estado</th></tr></thead><tbody id="tablaProy"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody></table></div>
+      </div>
+
+      <div class="view" id="view-salud">
+        <div class="section-header"><h2>❤️ Salud</h2></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="panel"><div class="panel-title">Próximas Jornadas</div><div style="color:var(--text2);line-height:2">💉 Vacunación<br>🦷 Odontología<br>🧠 Salud Mental</div></div>
+          <div class="panel"><div class="panel-title">Contactos</div><div style="color:var(--text2);line-height:2">🏥 Ambulatorio<br>🚑 Emergencias: 171</div></div>
+        </div>
+      </div>
+
+      <div class="view" id="view-ubicacion">
+        <div class="section-header"><h2>📍 Ubicación</h2></div>
+        <div class="panel"><div class="panel-title">San Isidro</div><div style="color:var(--text2)">Comunidad con tradición histórica.</div></div>
+      </div>
+
+      <div class="view" id="view-info">
+        <div class="section-header"><h2>ℹ️ Información</h2></div>
+        <div class="panel"><div class="panel-title">San Isidro Digital</div><div style="color:var(--text2)">Sistema de gestión comunitaria</div></div>
+      </div>
+
+      <div class="view" id="view-chat">
+        <div class="section-header"><h2>✨ Asistente IA</h2></div>
+        <div class="chat-wrap">
+          <div class="chat-messages" id="chatMessages">
+            <div class="msg ai"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble">¡Hola! Soy el Asistente de San Isidro Digital.</div></div>
+          </div>
+          <div class="chat-input-row">
+            <input class="chat-input" id="chatInput" placeholder="Escribe..." onkeydown="if(event.key==='Enter')sendMsg()">
+            <button class="chat-send" onclick="sendMsg()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+const API = 'https://san-isidro-digital.onrender.com/api';
+const GROQ_KEY = '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';
+let token = localStorage.getItem('token');
+let userRol = localStorage.getItem('userRol');
+let isBackendUp = false;
+
+// Test backend
+async function testBackend() {
+  try {
+    const res = await fetch(API.replace('/api', '') + '/api/health', { method: 'GET' });
+    isBackendUp = res.ok;
+  } catch(e) {
+    isBackendUp = false;
+  }
+  document.getElementById('backendStatus').innerHTML = isBackendUp ? 
+    '<div class="status-dot"></div> Backend Activo' : 
+    '<div class="status-dot" style="background:#fbbf24"></div> Modo Local';
+}
+
+// AUTH
+function doLogin() {
+  const rol = document.getElementById('loginRol').value;
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  
+  if (!email || !pass) { err.textContent = 'Completa todos los campos'; err.style.display = 'block'; return; }
+  
+  // Accept demo login
+  if ((email === 'admin@sanisidro.gob.ve' && pass === 'admin123' && rol === 'administrador') || 
+      (rol === 'usuario')) {
+    localStorage.setItem('userRol', rol);
+    localStorage.setItem('userEmail', email);
+    userRol = rol;
+    err.style.display = 'none';
+    showApp();
+  } else {
+    err.textContent = 'Credenciales incorrectas';
+    err.style.display = 'block';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userRol');
+  localStorage.removeItem('userEmail');
+  location.reload();
+}
+
+function showApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  document.getElementById('userPill').textContent = '👤 ' + (userRol === 'administrador' ? 'Admin' : 'Usuario');
+  testBackend();
+  loadDashboard();
+}
+
+// NAV
+document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => showView(el.dataset.view)));
+document.querySelectorAll('.module-card[data-view]').forEach(el => el.addEventListener('click', () => showView(el.dataset.view)));
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.querySelectorAll(`.nav-item[data-view="${id}"]`).forEach(n => n.classList.add('active'));
+  const titles = { dashboard:'Dashboard', solicitudes:'Solicitudes', recursos:'Recursos CLAP', emprendimientos:'Emprendimientos', proyectos:'Proyectos', salud:'Salud', ubicacion:'Ubicación', info:'Información', chat:'Asistente IA' };
+  document.getElementById('pageTitle').textContent = titles[id] || id;
+  if (id !== 'dashboard') loadData(id);
+}
+
+function toggleForm(id) {
+  document.getElementById(id).style.display = document.getElementById(id).style.display === 'none' ? 'block' : 'none';
+}
+
+// DATA
+async function loadDashboard() {
+  const data = { solicitudes: 0, clap: 0, emprendimientos: 0, proyectos: 0 };
+  try {
+    if (isBackendUp && token) {
+      const res = await fetch(API + '/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) Object.assign(data, await res.json());
+    }
+  } catch(e) {}
+  document.getElementById('cnt-sol').textContent = data.solicitudes;
+  document.getElementById('cnt-clap').textContent = data.clap;
+  document.getElementById('cnt-empr').textContent = data.emprendimientos;
+  document.getElementById('cnt-proy').textContent = data.proyectos;
+  document.getElementById('mod-sol').textContent = data.solicitudes;
+  document.getElementById('mod-empr').textContent = data.emprendimientos;
+  document.getElementById('mod-proy').textContent = data.proyectos;
+}
+
+async function loadData(type) {
+  const tbody = document.getElementById('tabla' + (type === 'clap' ? 'Clap' : type.charAt(0).toUpperCase() + type.slice(1)));
+  tbody.innerHTML = '<tr><td colspan="5" class="loading">Cargando...</td></tr>';
+  
+  try {
+    if (isBackendUp && token) {
+      const res = await fetch(API + '/' + type, { headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) {
+        const data = await res.json();
+        renderTable(type, data);
+        return;
+      }
+    }
+  } catch(e) {}
+  
+  tbody.innerHTML = '<tr><td colspan="5" class="loading">Backend no disponible. Usa modo local.</td></tr>';
+}
+
+function renderTable(type, data) {
+  const tbody = document.getElementById('tabla' + (type === 'clap' ? 'Clap' : type.charAt(0).toUpperCase() + type.slice(1)));
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">Sin registros</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((r, i) => {
+    const cols = {
+      solicitudes: `<td>${r.nombre}</td><td>${r.tipo}</td><td>${r.descripcion || r.descripcion}</td><td><span class="tag tag-p">${r.estado || 'Pendiente'}</span></td>`,
+      clap: `<td>${r.nombre}</td><td>${r.tipo}</td><td>${r.cantidad || 1}</td><td>${r.fecha ? new Date(r.fecha).toLocaleDateString() : '-'}</td>`,
+      emprendimientos: `<td>${r.nombre}</td><td>${r.responsable}</td><td>${r.categoria}</td><td><span class="tag tag-a">Activo</span></td>`,
+      proyectos: `<td>${r.nombre}</td><td>${r.sector}</td><td>${r.tipo}</td><td><span class="tag tag-a">En Curso</span></td>`
+    };
+    return `<tr><td style="color:var(--text3)">${String(i+1).padStart(3,'0')}</td>${cols[type] || ''}</tr>`;
+  }).join('');
+}
+
+async function addData(type) {
+  const fields = { solicitudes: ['nombre', 'tipo', 'desc'], clap: ['nombre', 'tipo', 'cant'], emprendimientos: ['nombre', 'persona', 'cat'], proyectos: ['nombre', 'sector', 'tipo'] };
+  const data = {};
+  fields[type].forEach(f => {
+    const el = document.getElementById(type + '-' + f);
+    if (el) data[f === 'desc' ? 'descripcion' : f === 'persona' ? 'responsable' : f === 'cat' ? 'categoria' : f] = el.value;
+  });
+  
+  if (!data.nombre) { showNotif('Completa los campos'); return; }
+  
+  try {
+    if (isBackendUp && token) {
+      const res = await fetch(API + '/' + type, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) { showNotif('Registrado en servidor'); loadData(type); return; }
+    }
+  } catch(e) {}
+  
+  showNotif('Error: Backend no disponible');
+}
+
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg; n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+// CHAT
+async function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML += `<div class="msg user"><div class="msg-avatar avatar-user">👤</div><div class="msg-bubble">${text}</div></div>`;
+  const typingId = 'typing-' + Date.now();
+  msgs.innerHTML += `<div class="msg ai" id="${typingId}"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [{role: 'system', content: 'Asistente de San Isidro Digital. Responde en español.'}, {role: 'user', content: text}],
+        max_tokens: 300
+      })
+    });
+    const d = await resp.json();
+    const reply = d.choices?.[0]?.message?.content || 'Lo siento.';
+    document.getElementById(typingId).outerHTML = `<div class="msg ai"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble">${reply.replace(/\n/g, '<br>')}</div></div>`;
+  } catch(e) {
+    document.getElementById(typingId).outerHTML = `<div class="msg ai"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble">⚠️ Error</div></div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+</script>
+</body>
+</html>

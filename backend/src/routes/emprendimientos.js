@@ -27,10 +27,18 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { estado } = req.body
+    const { estado, nombre, responsable, categoria, descripcion, inversion } = req.body
+    const data = {}
+    if (estado !== undefined) data.estado = estado
+    if (nombre !== undefined) data.nombre = nombre
+    if (responsable !== undefined) data.responsable = responsable
+    if (categoria !== undefined) data.categoria = categoria
+    if (descripcion !== undefined) data.descripcion = descripcion
+    if (inversion !== undefined) data.inversion = inversion
+
     const emprendimiento = await req.prisma.emprendimiento.update({
       where: { id: parseInt(req.params.id) },
-      data: { estado }
+      data
     })
     res.json(emprendimiento)
   } catch (error) {
