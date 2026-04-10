@@ -11,6 +11,12 @@ import emprendimientosRouter from './routes/emprendimientos.js'
 import proyectosRouter from './routes/proyectos.js'
 import beneficiariosRouter from './routes/beneficiarios.js'
 import dashboardRouter from './routes/dashboard.js'
+import gasRouter from './routes/gas.js'
+import asambleasRouter from './routes/asambleas.js'
+import saludRouter from './routes/salud.js'
+import noticiasRouter from './routes/noticias.js'
+import publicRouter from './routes/public.js'
+import aiRouter from './routes/ai.js'
 
 const app = express()
 const prisma = new PrismaClient()
@@ -53,6 +59,12 @@ app.use('/api/emprendimientos', authMiddleware, adminOnly, emprendimientosRouter
 app.use('/api/proyectos', authMiddleware, adminOnly, proyectosRouter)
 app.use('/api/beneficiarios', authMiddleware, adminOnly, beneficiariosRouter)
 app.use('/api/dashboard', authMiddleware, dashboardRouter)
+app.use('/api/gas', authMiddleware, adminOnly, gasRouter)
+app.use('/api/asambleas', authMiddleware, adminOnly, asambleasRouter)
+app.use('/api/salud', authMiddleware, adminOnly, saludRouter)
+app.use('/api/noticias', noticiasRouter) // auth handled inside specific routes
+app.use('/api/public', publicRouter)
+app.use('/api/ai', authMiddleware, aiRouter)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

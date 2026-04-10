@@ -1,22 +1,19 @@
 import { useState, useEffect } from 'react'
 import { api } from '../services/api'
 
-const TIPOS = ['Vialidad/Calle Dañada', 'Infraestructura General', 'Ambiente y Ecología', 'Educación Comunitaria', 'Salud Pública', 'Cultura y Recreación']
-const ESTADOS = { 'En Planificación': { bg: 'rgba(147,51,234,0.15)', color: '#a855f7' }, 'En Curso': { bg: 'rgba(2,132,199,0.15)', color: '#38bdf8' }, 'Completado': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' }, 'Pausado': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' } }
-
-export default function Proyectos() {
-  const [proyectos, setProyectos] = useState([])
+export default function Noticias() {
+  const [noticias, setNoticias] = useState([])
   const [loading, setLoading] = useState(true)
   const [mostrarForm, setMostrarForm] = useState(false)
   const [notif, setNotif] = useState('')
-  const [form, setForm] = useState({ titulo: '', descripcion: '', tipo: 'Vialidad/Calle Dañada', sector: '', presupuesto: '' })
+  const [form, setForm] = useState({ titulo: '', contenido: '', tipo: 'General' })
 
   useEffect(() => { fetchData() }, [])
 
   async function fetchData() {
     try {
-      const data = await api.proyectos.list()
-      setProyectos(data)
+      const data = await api.noticias.list()
+      setNoticias(data)
     } catch (e) { mostrarNotif('Error: ' + e.message) }
     finally { setLoading(false) }
   }
@@ -24,30 +21,30 @@ export default function Proyectos() {
   function handleChange(e) { setForm({ ...form, [e.target.name]: e.target.value }) }
 
   async function agregar() {
-    if (!form.titulo.trim() || !form.sector.trim()) { mostrarNotif('⚠️ Completa los campos requeridos'); return }
+    if (!form.titulo.trim() || !form.contenido.trim()) { mostrarNotif('⚠️ Completa los campos'); return }
     try {
-      await api.proyectos.create({...form, presupuesto: parseFloat(form.presupuesto) || 0})
-      setForm({ titulo: '', descripcion: '', tipo: 'Vialidad/Calle Dañada', sector: '', presupuesto: '' })
+      await api.noticias.create({...form, activa: true})
+      setForm({ titulo: '', contenido: '', tipo: 'General' })
       setMostrarForm(false)
       fetchData()
-      mostrarNotif('✅ Proyecto registrado')
+      mostrarNotif('✅ Noticia publicada en el portal')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
-  async function actualizarCampo(id, campo, valor) {
+  async function toggleActiva(id, activa) {
     try {
-      await api.proyectos.update(id, { [campo]: valor })
+      await api.noticias.update(id, { activa: !activa })
       fetchData()
-      mostrarNotif('✅ Actualizado exitosamente')
+      mostrarNotif('✅ Estado actualizado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   async function eliminar(id) {
-    if (!confirm('¿Eliminar este proyecto?')) return
+    if (!confirm('¿Eliminar esta noticia por completo?')) return
     try {
-      await api.proyectos.delete(id)
+      await api.noticias.delete(id)
       fetchData()
-      mostrarNotif('✅ Proyecto eliminado')
+      mostrarNotif('✅ Eliminado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
@@ -56,68 +53,58 @@ export default function Proyectos() {
   return (
     <div>
       <div style={s.header}>
-        <h2 style={s.titulo}>🏘 Proyectos Comunitarios</h2>
-        <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Nuevo Proyecto</button>
+        <div>
+          <h2 style={s.titulo}>📰 Cartelera de Noticias</h2>
+          <div style={{fontSize: 13, color: '#a89fc7', marginTop: 4}}>Gestión de las publicaciones que aparecen en el portal público</div>
+        </div>
+        <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Publicar Noticia</button>
       </div>
 
       {mostrarForm && (
         <div style={s.panel}>
-          <div style={s.panelTitle}>Registrar Proyecto</div>
+          <div style={s.panelTitle}>Nueva Publicación Pública</div>
           <div style={s.formRow}>
             <div style={s.formGroup}>
-              <label style={s.label}>Título del Proyecto *</label>
-              <input style={s.input} name="titulo" value={form.titulo} onChange={handleChange} placeholder="Nombre del proyecto" />
+              <label style={s.label}>Título (Titular de la Noticia) *</label>
+              <input style={s.input} name="titulo" value={form.titulo} onChange={handleChange} placeholder="¡Gran jornada este fin de semana!" />
             </div>
             <div style={s.formGroup}>
-              <label style={s.label}>Sector *</label>
-              <input style={s.input} name="sector" value={form.sector} onChange={handleChange} placeholder="Sector/Comunidad" />
-            </div>
-          </div>
-          <div style={s.formRow}>
-            <div style={s.formGroup}>
-              <label style={s.label}>Tipo de Proyecto</label>
+              <label style={s.label}>Clasificación</label>
               <select style={s.input} name="tipo" value={form.tipo} onChange={handleChange}>
-                {TIPOS.map(t => <option key={t}>{t}</option>)}
+                <option>General</option>
+                <option>Salud</option>
+                <option>Asamblea</option>
+                <option>Alerta</option>
+                <option>Trámites</option>
               </select>
-            </div>
-            <div style={s.formGroup}>
-              <label style={s.label}>Presupuesto Usado ($)</label>
-              <input style={s.input} type="number" name="presupuesto" value={form.presupuesto} onChange={handleChange} placeholder="Ej. 1500" />
             </div>
           </div>
           <div style={s.formGroup}>
-            <label style={s.label}>Descripción</label>
-            <textarea style={{ ...s.input, minHeight: 90, resize: 'vertical' }} name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Describe el proyecto..." />
+            <label style={s.label}>Contenido de la Noticia *</label>
+            <textarea style={{ ...s.input, minHeight: 120, resize: 'vertical' }} name="contenido" value={form.contenido} onChange={handleChange} placeholder="Detalla la información al público..." />
           </div>
-          <button style={s.btnPrimary} onClick={agregar}>Registrar Proyecto</button>
+          <button style={s.btnPrimary} onClick={agregar}>Publicar Ahora</button>
         </div>
       )}
 
-      <div style={s.panel}>
-        {loading ? <div style={s.empty}>Cargando...</div> : proyectos.length === 0 ? (
-          <div style={s.empty}>Sin proyectos registrados</div>
-        ) : (
-          <table style={s.table}>
-            <thead><tr>{['#', 'Proyecto', 'Sector', 'Tipo', 'Presupuesto ($)', 'Fecha', 'Estado', 'Acciones'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr></thead>
-            <tbody>
-              {proyectos.map((p, i) => (
-                <tr key={p.id}>
-                  <td style={{ ...s.td, color: '#6b61a0', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
-                  <td style={s.td}>{p.titulo}</td>
-                  <td style={s.td}>{p.sector}</td>
-                  <td style={s.td}>{p.tipo}</td>
-                  <td style={s.td}>${p.presupuesto ? Number(p.presupuesto).toFixed(2) : '0.00'}</td>
-                  <td style={s.td}>{new Date(p.fecha).toLocaleDateString()}</td>
-                  <td style={s.td}>
-                    <select style={{ ...s.tag, background: ESTADOS[p.estado]?.bg || ESTADOS['En Planificación'].bg, color: ESTADOS[p.estado]?.color || ESTADOS['En Planificación'].color }} value={p.estado} onChange={ev => actualizarCampo(p.id, 'estado', ev.target.value)}>
-                      {Object.keys(ESTADOS).map(est => <option key={est}>{est}</option>)}
-                    </select>
-                  </td>
-                  <td style={s.td}><button style={s.btnDelete} onClick={() => eliminar(p.id)}>🗑</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div style={s.gridNoticias}>
+        {loading ? <div style={s.empty}>Cargando...</div> : noticias.length === 0 ? <div style={s.empty}>Sin noticias.</div> : (
+          noticias.map((n) => (
+            <div key={n.id} style={{...s.cardNoticia, border: n.activa ? '1px solid #e1e7e4' : '1px dashed #cbd5e1', opacity: n.activa ? 1 : 0.6 }}>
+               <div style={s.noticiaHeader}>
+                 <span style={{...s.tag, background: n.tipo === 'Asamblea' ? 'rgba(147,51,234,0.15)' : n.tipo === 'Salud' ? 'rgba(56,189,248,0.15)' : n.tipo === 'Alerta' ? 'rgba(239,68,68,0.15)' : 'rgba(100,116,139,0.15)', color: n.tipo === 'Asamblea' ? '#a855f7' : n.tipo === 'Salud' ? '#38bdf8' : n.tipo === 'Alerta' ? '#ef4444' : '#a89fc7'}}>{n.tipo}</span>
+                 <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{new Date(n.fecha).toLocaleDateString()}</span>
+               </div>
+               <div style={s.noticiaTitle}>{n.titulo}</div>
+               <div style={s.noticiaContent}>{n.contenido}</div>
+               <div style={s.noticiaFooter}>
+                 <button style={{...s.btnSec, color: n.activa ? '#34d399' : '#a89fc7', background: n.activa ? 'rgba(52,211,153,0.15)' : '#252048', border: n.activa ? 'none' : '1px solid #cbd5e1'}} onClick={() => toggleActiva(n.id, n.activa)}>
+                   {n.activa ? '👁 Visible' : '🚫 Oculta'}
+                 </button>
+                 <button style={s.btnDelete} onClick={() => eliminar(n.id)}>🗑</button>
+               </div>
+            </div>
+          ))
         )}
       </div>
       {notif && <div style={s.notif}>{notif}</div>}

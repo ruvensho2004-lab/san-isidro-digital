@@ -8,11 +8,12 @@
 <style>
   :root { --bg: #0d0b1a; --bg2: #13102a; --bg3: #1a1638; --card: #1e1a3a; --card2: #252048; --border: rgba(120,100,255,0.18); --accent: #7c5cfc; --accent2: #a78bfa; --accent3: #38bdf8; --accent4: #f472b6; --accent5: #34d399; --text: #e8e4ff; --text2: #a89fc7; --text3: #6b61a0; --glow: rgba(124,92,252,0.3); }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { height:100%; font-family:'Sora',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; }
+  html { scroll-behavior: smooth; }
+  body { min-height: 100vh; font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); }
 
   /* PORTAL HERO */
-  .hero { min-height:100vh; display:flex; flex-direction:column; background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 50%, var(--bg3) 100%); position:relative; overflow:hidden; }
-  .hero::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle at 30% 30%, rgba(124,92,252,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(56,189,248,0.1) 0%, transparent 50%); animation:float 20s ease-in-out infinite; }
+  .hero { min-height: 100vh; display: flex; flex-direction: column; background: linear-gradient(135deg, #0d0b1a 0%, #171333 50%, #1e1a3a 100%); position: relative; overflow: hidden; }
+  .hero::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle at 30% 30%, rgba(124,92,252,0.2) 0%, transparent 40%), radial-gradient(circle at 70% 70%, rgba(56,189,248,0.15) 0%, transparent 40%); animation:float 25s ease-in-out infinite; mix-blend-mode: color-dodge; }
   @keyframes float { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-2%,-2%)} }
   
   .portal-header { display:flex; justify-content:space-between; align-items:center; padding:20px 40px; position:relative; z-index:10; }
@@ -34,19 +35,35 @@
   
   .features { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; max-width:1200px; margin-bottom:50px; }
   .feature-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px; text-align:center; transition:all .3s; }
-  .feature-card:hover { transform:translateY(-5px); border-color:var(--accent); }
+  .feature-card:hover { transform:translateY(-8px); border-color:var(--accent); box-shadow:0 15px 30px rgba(124,92,252,0.25); background:linear-gradient(180deg, var(--card) 0%, rgba(124,92,252,0.05) 100%); }
   .feature-icon { font-size:36px; margin-bottom:16px; }
   .feature-title { font-size:16px; font-weight:700; margin-bottom:8px; }
   .feature-desc { font-size:13px; color:var(--text2); }
   
-  .stats { display:flex; gap:60px; justify-content:center; }
+  .stats { display:flex; gap:60px; justify-content:center; flex-wrap:wrap; }
   .stat { text-align:center; }
   .stat-num { font-size:48px; font-weight:700; color:var(--accent2); }
   .stat-label { font-size:14px; color:var(--text2); }
   
+  /* RESPONSIVE DESIGN */
+  @media (max-width: 900px) {
+    .features { grid-template-columns: repeat(2, 1fr); }
+    .stats { gap: 40px; }
+    .hero-title { font-size: 44px; }
+  }
+  @media (max-width: 600px) {
+    .features { grid-template-columns: 1fr; }
+    .hero-title { font-size: 36px; }
+    .stats { gap: 20px; flex-direction: column; }
+    .contact-form { grid-template-columns: 1fr; }
+    .contact-form textarea { grid-column: span 1; }
+    .contact-form button { grid-column: span 1; }
+    .portal-header { flex-direction: column; gap: 16px; text-align: center; }
+  }
+  
   /* FLOATING AI BOT */
-  .float-bot { position:fixed; bottom:24px; right:24px; width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent3)); border:none; cursor:pointer; box-shadow:0 4px 20px var(--glow); z-index:9999; display:flex; align-items:center; justify-content:center; font-size:28px; transition:all .3s; animation:botPulse 2s infinite; }
-  .float-bot:hover { transform:scale(1.1); }
+  .float-bot { position:fixed; bottom:24px; right:24px; width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent3)); border:none; cursor:pointer; box-shadow:0 4px 20px var(--glow); z-index:9999; display:flex; align-items:center; justify-content:center; font-size:32px; transition:all .3s; animation:botPulse 2s infinite; }
+  .float-bot:hover { transform:scale(1.15) rotate(5deg); box-shadow:0 4px 30px rgba(56,189,248,0.6); }
   @keyframes botPulse { 0%,100%{box-shadow:0 4px 20px var(--glow)} 50%{box-shadow:0 4px 40px var(--glow),0 0 0 10px rgba(124,92,252,0.2)} }
   
   /* PUBLIC CHAT */
@@ -229,8 +246,9 @@
   .service-desc { font-size:12px; color:var(--text2); }
   .service-count { font-size:28px; font-weight:700; color:var(--accent2); margin-top:12px; }
   
-  .services-detail { display:none; min-height:100vh; background:var(--bg); }
+  .services-detail { display:none; min-height:100vh; background: linear-gradient(135deg, #0d0b1a 0%, #171333 50%, #1e1a3a 100%); position:relative; overflow:hidden; }
   .services-detail.active { display:block; }
+  .services-detail::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle at 30% 30%, rgba(124,92,252,0.15) 0%, transparent 40%), radial-gradient(circle at 70% 70%, rgba(56,189,248,0.1) 0%, transparent 40%); animation:float 25s ease-in-out infinite; mix-blend-mode: color-dodge; z-index:0; pointer-events:none;}
   .service-panel { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:32px; margin-bottom:20px; }
   .service-panel h3 { font-size:22px; margin-bottom:16px; color:var(--accent2); }
   .service-panel p { color:var(--text2); line-height:1.8; margin-bottom:16px; }
@@ -286,16 +304,26 @@
     <h1 class="hero-title">Sistema de Atención<br><span class="gradient">Comunitaria Digital</span></h1>
     <p class="hero-subtitle">Plataforma integral para la gestión de solicitudes, recursos CLAP, emprendimientos y proyectos comunitarios del Consejo Comunal San Isidro.</p>
     <div class="features">
-      <div class="feature-card" onclick="showService('solicitudes')"><div class="feature-icon">📋</div><div class="feature-title">Solicitudes</div><div class="feature-desc">Gestión de peticiones</div></div>
-      <div class="feature-card" onclick="showService('clap')"><div class="feature-icon">📦</div><div class="feature-title">Recursos CLAP</div><div class="feature-desc">Distribución</div></div>
-      <div class="feature-card" onclick="showService('emprendimientos')"><div class="feature-icon">💡</div><div class="feature-title">Emprendimientos</div><div class="feature-desc">Negocios locales</div></div>
-      <div class="feature-card" onclick="showService('proyectos')"><div class="feature-icon">🏘</div><div class="feature-title">Proyectos</div><div class="feature-desc">Obras comunitarias</div></div>
+      <div class="feature-card" onclick="handleFeature('solicitudes')"><div class="feature-icon">📋</div><div class="feature-title">Solicitudes</div><div class="feature-desc">Solicita en línea</div></div>
+      <div class="feature-card" onclick="handleFeature('clap')"><div class="feature-icon">📦</div><div class="feature-title">Recursos CLAP</div><div class="feature-desc">Verifica tu estatus</div></div>
+      <div class="feature-card" onclick="handleFeature('emprendimientos')"><div class="feature-icon">💡</div><div class="feature-title">Emprendimientos</div><div class="feature-desc">Fondo de ayuda</div></div>
+      <div class="feature-card" onclick="handleFeature('proyectos')"><div class="feature-icon">🏘</div><div class="feature-title">Proyectos</div><div class="feature-desc">Obras en curso</div></div>
     </div>
     <div class="stats">
       <div class="stat"><div class="stat-num" id="stat-sol">0</div><div class="stat-label">Solicitudes</div></div>
       <div class="stat"><div class="stat-num" id="stat-clap">0</div><div class="stat-label">Familias CLAP</div></div>
       <div class="stat"><div class="stat-num" id="stat-empr">0</div><div class="stat-label">Emprendimientos</div></div>
       <div class="stat"><div class="stat-num" id="stat-proy">0</div><div class="stat-label">Proyectos</div></div>
+    </div>
+    
+    <!-- CARTELERA PÚBLICA -->
+    <div style="margin: 60px auto 20px; max-width: 1200px; width: 100%;">
+      <h3 style="font-size:24px; margin-bottom:20px; text-align:center; display:flex; align-items:center; justify-content:center; gap:10px;">
+        📰 Cartelera Comunitaria y Acuerdos
+      </h3>
+      <div id="public-noticias" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; text-align:left;">
+        <div style="text-align:center; color:var(--text2); grid-column:1/-1;">Cargando anuncios públicos...</div>
+      </div>
     </div>
     
     <!-- CONSULTA POR CÉDULA - EN PORTAL PRINCIPAL -->
@@ -311,111 +339,25 @@
           <div id="consultaContent"></div>
         </div>
       </div>
-    </div>
-  </div>
-  
-  <!-- SERVICIOS DETALLE -->
-  <div class="services-detail" id="servicesDetail">
-    <div class="portal-content">
-      <button onclick="hideServices()" style="background:none;border:none;color:var(--text2);font-size:24px;cursor:pointer;margin-bottom:20px">← Volver</button>
-      
-      <!-- SOLICITUDES -->
-      <div class="service-panel" id="panel-solicitudes">
-        <h3>📋 Sistema de Solicitudes Ciudadanas</h3>
-        <p>El Consejo Comunal San Isidro ofrece un sistema de atención rápida para todas las peticiones de los vecinos. Puedes realizar trámites administrativos, solicitar ayuda social, hacer reclamos de servicios y obtener información general.</p>
-        <div class="service-list">
-          <div class="service-list-item">📄 Trámites Administrativos</div>
-          <div class="service-list-item">🤝 Ayuda Social</div>
-          <div class="service-list-item">📢 Reclamos de Servicios</div>
-          <div class="service-list-item">ℹ️ Información General</div>
-          <div class="service-list-item">🏥 Salud y Medicina</div>
-          <div class="service-list-item">🎓 Becas y Educación</div>
-        </div>
-      </div>
-      
-      <!-- CLAP -->
-      <div class="service-panel" id="panel-clap">
-        <h3>📦 Programa de Distribución CLAP</h3>
-        <p>El Consejo Comunal gestiona la distribución de alimentos, medicamentos y materiales escolares a las familias de San Isidro. Nuestro objetivo es garantizar la seguridad alimentaria de todos los habitantes.</p>
-        <div class="service-list">
-          <div class="service-list-item">🥫 Cajas de Alimentos CLAP</div>
-          <div class="service-list-item">💊 Kit de Medicamentos</div>
-          <div class="service-list-item">📚 Material Escolar</div>
-          <div class="service-list-item">👶 Programa de Lactancia</div>
-          <div class="service-list-item">👴 Atención al Adulto Mayor</div>
-          <div class="service-list-item">🧒 Programas Infantiles</div>
-        </div>
-      </div>
-      
-      <!-- EMPRENDIMIENTOS -->
-      <div class="service-panel" id="panel-emprendimientos">
-        <h3>💡 Incubadora de Emprendimientos</h3>
-        <p>Fomentamos el desarrollo económico local mediante el apoyo a pequeños negocios y emprendimientos comunitarios. Brindamos capacitación, financiamiento y asesoramiento a emprendedores de todos los sectores.</p>
-        <div class="service-list">
-          <div class="service-list-item">🍞 Alimentos y Panadería</div>
-          <div class="service-list-item">🧵 Artesanía y Textiles</div>
-          <div class="service-list-item">🔧 Servicios Técnicos</div>
-          <div class="service-list-item">💻 Tecnología Digital</div>
-          <div class="service-list-item">🎨 Diseño y Creatividad</div>
-          <div class="service-list-item">🌱 Agricultura Local</div>
-        </div>
-      </div>
-      
-      <!-- PROYECTOS -->
-      <div class="service-panel" id="panel-proyectos">
-        <h3>🏘 Proyectos Comunitarios</h3>
-        <p>Desarrollamos obras e iniciativas que mejoran la calidad de vida de todos los habitantes de San Isidro. Trabajamos en infraestructura, ambiente, educación, salud y cultura.</p>
-        <div class="service-list">
-          <div class="service-list-item">🛣️ Infraestructura Vial</div>
-          <div class="service-list-item">💡 Iluminación Pública</div>
-          <div class="service-list-item">🌳 Áreas Verdes</div>
-          <div class="service-list-item">🏫 Mejoras Educativas</div>
-          <div class="service-list-item">🏥 Salud Comunitaria</div>
-          <div class="service-list-item">🎭 Actividades Culturales</div>
-        </div>
-      </div>
-      
-      <!-- AUTORIDADES -->
-      <div class="service-panel">
-        <h3>👥 Nuestra Estructura Comunitaria</h3>
-        <p>El Consejo Comunal San Isidro está liderado por un equipo de vecinos comprometidos con el desarrollo de nuestra comunidad.</p>
-        <div class="autoridades-list">
-          <div class="autoridad-card"><div class="autoridad-photo">👨</div><div class="autoridad-nombre">Presidente</div><div class="autoridad-cargo">Jefe de Oficina</div></div>
-          <div class="autoridad-card"><div class="autoridad-photo">👩</div><div class="autoridad-nombre">Vicepresidenta</div><div class="autoridad-cargo">Coordinadora Social</div></div>
-          <div class="autoridad-card"><div class="autoridad-photo">👨‍💼</div><div class="autoridad-nombre">Secretario</div><div class="autoridad-cargo">Gestión Administrativa</div></div>
-        </div>
-      </div>
-      
-      <!-- CONSULTA POR CÉDULA -->
-      <div class="consulta-section">
-        <div class="consulta-box">
-          <h3 class="consulta-title">🔍 Consulta tu Información</h3>
-          <p style="color:var(--text2);margin-bottom:20px">Ingresa tu número de cédula para ver tus solicitudes, beneficios CLAP y más.</p>
-          <div class="consulta-form">
-            <input type="text" id="consulta-cedula" placeholder="Ej: 12345678 (sin puntos)" maxlength="10">
-            <button onclick="consultarCedula()">🔍 Consultar</button>
-          </div>
-          <div class="consulta-result" id="consultaResult">
-            <div id="consultaContent"></div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- CONTACTO -->
-      <div class="contact-section">
-        <h3>📨 Contacto y Sugerencias</h3>
+    <!-- CONTACTO (REUBICADO AL PORTAL) -->
+    <div class="contact-section" id="contacto-portal" style="max-width:600px;margin:40px auto; width:100%;">
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:30px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3 style="text-align:center;margin-bottom:20px;font-size:20px">📨 Solicitudes en Línea</h3>
+        <p style="text-align:center;color:var(--text2);margin-bottom:20px;font-size:13px">Envía tu petición o sugiere un proyecto para el Consejo.</p>
         <div class="contact-form">
           <input type="text" id="contact-name" placeholder="Tu Nombre">
+          <input type="text" id="contact-cedula" placeholder="Tu Cédula (Ej: 12345678)">
           <input type="tel" id="contact-phone" placeholder="Teléfono">
           <input type="email" id="contact-email" placeholder="Correo Electrónico">
           <select id="contact-type">
             <option>Solicitud de Información</option>
+            <option>Trámite Administrativo</option>
             <option>Reclamo</option>
-            <option>Sugerencia</option>
+            <option>Emprendimiento / Proyecto</option>
             <option>Ayuda Social</option>
           </select>
-          <textarea id="contact-msg" placeholder="Describe tu mensaje..."></textarea>
-          <button onclick="sendContact()">📤 Enviar Mensaje</button>
+          <textarea id="contact-msg" placeholder="Describe tu mensaje o petición..." style="resize:vertical;min-height:80px;"></textarea>
+          <button onclick="sendContact()">📤 Enviar</button>
         </div>
       </div>
     </div>
@@ -437,151 +379,6 @@
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
-<div class="admin-panel" id="adminPanel">
-  <aside class="sidebar">
-    <div class="logo-area">
-      <div class="logo-badge"><span style="font-size:20px">🏛️</span><div class="logo-title">San Isidro<br>Digital</div></div>
-      <div class="logo-sub">Sistema de Atención Comunal</div>
-    </div>
-    <div style="flex:1;overflow-y:auto;">
-      <div class="nav-section">
-        <div class="nav-label">Atención Comunal</div>
-        <div class="nav-item active" data-view="dashboard">📊 Dashboard</div>
-        <div class="nav-item" data-view="solicitudes">📋 Solicitudes</div>
-        <div class="nav-item" data-view="recursos">📦 Recursos CLAP</div>
-        <div class="nav-item" data-view="proyectos">🏘 Proyectos</div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-label">Emprendimiento</div>
-        <div class="nav-item" data-view="emprendimientos">💡 Emprendimientos</div>
-        <div class="nav-item" data-view="capacitacion">🎓 Capacitación</div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-label">Más</div>
-        <div class="nav-item" data-view="salud">❤️ Salud</div>
-        <div class="nav-item" data-view="ubicacion">📍 Ubicación</div>
-        <div class="nav-item" data-view="info">ℹ️ Información</div>
-      </div>
-    </div>
-    <div class="sidebar-footer">
-      <button class="asistente-btn" data-view="chat">✨ Asistente IA</button>
-      <button class="logout-btn" onclick="logout()">🚪 Cerrar Sesión</button>
-    </div>
-  </aside>
-  
-  <div class="main">
-    <div class="topbar">
-      <div>
-        <div class="page-title" id="pageTitle">Dashboard</div>
-        <div class="page-sub" id="pageSub">Sistema Integral de Atención Comunal</div>
-      </div>
-      <div class="topbar-right">
-        <div class="user-pill" id="userPill">👤</div>
-        <div class="status-pill"><div class="status-dot"></div> Sistema Activo</div>
-      </div>
-    </div>
-    
-    <div class="content">
-      <!-- DASHBOARD -->
-      <div class="view active" id="view-dashboard">
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-label">Solicitudes</div><div class="stat-row"><div class="stat-num" id="cnt-sol">0</div><div class="stat-badge badge-activo">ACTIVAS</div></div></div>
-          <div class="stat-card"><div class="stat-label">Recursos CLAP</div><div class="stat-row"><div class="stat-num" id="cnt-clap">0</div><div class="stat-badge badge-total">TOTAL</div></div></div>
-          <div class="stat-card"><div class="stat-label">Emprendimientos</div><div class="stat-row"><div class="stat-num" id="cnt-empr">0</div><div class="stat-badge badge-activo">ACTIVOS</div></div></div>
-          <div class="stat-card"><div class="stat-label">Proyectos</div><div class="stat-row"><div class="stat-num" id="cnt-proy">0</div><div class="stat-badge badge-total">TOTAL</div></div></div>
-        </div>
-        <div class="section-grid">
-          <div class="module-card" data-view="solicitudes"><div class="module-icon icon-purple">📋</div><div class="module-title">Solicitudes Ciudadanas</div><div class="module-desc">Sistema de atención rápida</div><div class="module-count" id="mod-sol">0</div></div>
-          <div class="module-card" data-view="emprendimientos"><div class="module-icon icon-pink">💡</div><div class="module-title">Emprendimientos</div><div class="module-desc">Negocios inclusivos</div><div class="module-count" id="mod-empr">0</div></div>
-          <div class="module-card" data-view="proyectos"><div class="module-icon icon-green">🏘</div><div class="module-title">Proyectos</div><div class="module-desc">Iniciativas comunitarias</div><div class="module-count" id="mod-proy">0</div></div>
-        </div>
-        <div class="bottom-grid">
-          <div class="panel"><div class="panel-title">Actividad Reciente</div><div id="activityFeed">Sin actividad</div></div>
-          <div class="panel"><div class="panel-title">Indicadores de Impacto</div>
-            <div class="impact-row"><div class="impact-label">Ciudadanos Atendidos</div><div class="impact-val val-blue" id="imp1">0</div></div>
-            <div class="impact-row"><div class="impact-label">Emprendimientos Activos</div><div class="impact-val val-yellow" id="imp2">0</div></div>
-            <div class="impact-row"><div class="impact-label">Proyectos en Curso</div><div class="impact-val val-pink" id="imp3">0</div></div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- SOLICITUDES -->
-      <div class="view" id="view-solicitudes">
-        <div class="section-header"><h2>📋 Solicitudes</h2><div class="header-actions"><button class="btn-secondary" onclick="renderTable('solicitudes')">↻</button><button class="btn-primary" onclick="toggleForm('formSolicitud')">+ Nueva</button></div></div>
-        <div id="formSolicitud" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="form-group"><label>Cédula</label><input type="text" id="sol-cedula" placeholder="Ej: 12345678"></div><div class="form-group"><label>Nombre</label><input type="text" id="sol-nombre"></div><div class="form-group"><label>Tipo</label><select id="sol-tipo"><option>Trámite</option><option>Ayuda Social</option><option>Reclamo</option><option>Información</option></select></div><div class="form-group"><label>Descripción</label><textarea id="sol-desc"></textarea></div><button class="btn-primary" onclick="addData('solicitudes')">Registrar</button></div></div>
-        <div class="table-wrap"><table><thead><tr><th>#</th><th>Cédula</th><th>Nombre</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead><tbody id="tablaSolicitudes"></tbody></table></div>
-      </div>
-      
-      <!-- RECURSOS -->
-      <div class="view" id="view-recursos">
-        <div class="section-header"><h2>📦 Recursos CLAP</h2><div class="header-actions"><button class="btn-secondary" onclick="renderTable('clap')">↻</button><button class="btn-primary" onclick="toggleForm('formClap')">+ Nuevo</button></div></div>
-        <div id="formClap" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="form-group"><label>Cédula</label><input type="text" id="clap-cedula" placeholder="Ej: 12345678"></div><div class="form-group"><label>Beneficiario</label><input type="text" id="clap-nombre"></div><div class="form-group"><label>Tipo</label><select id="clap-tipo"><option>Caja CLAP</option><option>Medicamentos</option><option>Material Escolar</option></select></div><div class="form-group"><label>Cantidad</label><input type="number" id="clap-cant" value="1"></div><button class="btn-primary" onclick="addData('clap')">Registrar</button></div></div>
-        <div class="table-wrap"><table><thead><tr><th>#</th><th>Cédula</th><th>Beneficiario</th><th>Tipo</th><th>Cantidad</th><th>Estado</th></tr></thead><tbody id="tablaClap"></tbody></table></div>
-      </div>
-      
-      <!-- EMPRENDIMIENTOS -->
-      <div class="view" id="view-emprendimientos">
-        <div class="section-header"><h2>💡 Emprendimientos</h2><div class="header-actions"><button class="btn-secondary" onclick="renderTable('emprendimientos')">↻</button><button class="btn-primary" onclick="toggleForm('formEmpr')">+ Nuevo</button></div></div>
-        <div id="formEmpr" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="form-group"><label>Cédula</label><input type="text" id="empr-cedula" placeholder="Ej: 12345678"></div><div class="form-group"><label>Nombre</label><input type="text" id="empr-nombre"></div><div class="form-group"><label>Responsable</label><input type="text" id="empr-persona"></div><div class="form-group"><label>Categoría</label><select id="empr-cat"><option>Alimentos</option><option>Artesanía</option><option>Servicios</option><option>Educación</option></select></div><button class="btn-primary" onclick="addData('emprendimientos')">Registrar</button></div></div>
-        <div class="table-wrap"><table><thead><tr><th>#</th><th>Cédula</th><th>Nombre</th><th>Responsable</th><th>Categoría</th><th>Estado</th></tr></thead><tbody id="tablaEmpr"></tbody></table></div>
-      </div>
-      
-      <!-- PROYECTOS -->
-      <div class="view" id="view-proyectos">
-        <div class="section-header"><h2>🏘 Proyectos</h2><div class="header-actions"><button class="btn-secondary" onclick="renderTable('proyectos')">↻</button><button class="btn-primary" onclick="toggleForm('formProy')">+ Nuevo</button></div></div>
-        <div id="formProy" style="display:none;margin-bottom:24px"><div class="panel form-wrap"><div class="form-group"><label>Nombre</label><input type="text" id="proy-nombre"></div><div class="form-group"><label>Sector</label><input type="text" id="proy-sector"></div><div class="form-group"><label>Tipo</label><select id="proy-tipo"><option>Infraestructura</option><option>Ambiente</option><option>Educación</option></select></div><button class="btn-primary" onclick="addData('proyectos')">Registrar</button></div></div>
-        <div class="table-wrap"><table><thead><tr><th>#</th><th>Nombre</th><th>Sector</th><th>Tipo</th><th>Estado</th></tr></thead><tbody id="tablaProy"></tbody></table></div>
-      </div>
-      
-      <!-- CAPACITACIÓN -->
-      <div class="view" id="view-capacitacion">
-        <div class="section-header"><h2>🎓 Capacitación Técnica</h2></div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
-          <div class="panel" style="text-align:center;"><div style="font-size:36px;margin-bottom:10px;">💻</div><div style="font-weight:700;margin-bottom:6px;">Tecnología Digital</div><div style="font-size:12px;color:var(--text2);">Ofimática, redes sociales</div></div>
-          <div class="panel" style="text-align:center;"><div style="font-size:36px;margin-bottom:10px;">🧵</div><div style="font-weight:700;margin-bottom:6px;">Oficios</div><div style="font-size:12px;color:var(--text2);">Costura, carpintería</div></div>
-          <div class="panel" style="text-align:center;"><div style="font-size:36px;margin-bottom:10px;">📊</div><div style="font-weight:700;margin-bottom:6px;">Gestión</div><div style="font-size:12px;color:var(--text2);">Administración, liderazgo</div></div>
-        </div>
-      </div>
-      
-      <!-- SALUD -->
-      <div class="view" id="view-salud">
-        <div class="section-header"><h2>❤️ Salud Comunitaria</h2></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div class="panel"><div class="panel-title">Próximas Jornadas</div><div style="color:var(--text2);line-height:2">💉 Vacunación<br>🦷 Odontología<br>🧠 Salud Mental</div></div>
-          <div class="panel"><div class="panel-title">Contactos</div><div style="color:var(--text2);line-height:2">🏥 Ambulatorio: 0212-XXX-XXXX<br>🚑 Emergencias: 171</div></div>
-        </div>
-      </div>
-      
-      <!-- UBICACIÓN -->
-      <div class="view" id="view-ubicacion">
-        <div class="section-header"><h2>📍 Ubicación e Historia</h2></div>
-        <div class="panel"><div class="panel-title">San Isidro</div><div style="color:var(--text2);line-height:1.8">Comunidad con tradición histórica y cultural.<br><br><strong style="color:var(--text)">Fundación:</strong> 1950<br><strong style="color:var(--text)">Población:</strong> ~45,000 habitantes</div></div>
-      </div>
-      
-      <!-- INFO -->
-      <div class="view" id="view-info">
-        <div class="section-header"><h2>ℹ️ Información</h2></div>
-        <div class="panel"><div class="panel-title">San Isidro Digital</div><div style="color:var(--text2);line-height:1.8">Sistema de gestión comunitaria con almacenamiento local.</div></div>
-      </div>
-      
-      <!-- CHAT -->
-      <div class="view" id="view-chat">
-        <div class="section-header"><h2>✨ Asistente IA</h2></div>
-        <div class="chat-wrap">
-          <div class="chat-messages" id="chatMessages">
-            <div class="msg ai"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble">¡Hola! Soy el Asistente de San Isidro Digital.</div></div>
-          </div>
-          <div class="chat-input-row">
-            <input class="chat-input" id="chatInput" placeholder="Escribe..." onkeydown="if(event.key==='Enter')sendMsg()">
-            <button class="chat-send" onclick="sendMsg()">➤</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- FLOATING AI BOT -->
 <button class="float-bot" onclick="togglePublicChat()">🤖</button>
 
@@ -596,7 +393,17 @@
     <button class="chat-close" onclick="togglePublicChat()">×</button>
   </div>
   <div class="chat-body" id="publicChatBody">
-    <div class="msg-pub ai"><div class="msg-avatar">🤖</div><div class="msg-text">¡Hola! Soy el asistente virtual de <strong>San Isidro Digital</strong>. ¿En qué puedo orientarte sobre el consejo comunal, recursos CLAP, emprendimientos o proyectos comunitarios?</div></div>
+    <div class="msg-pub ai">
+      <div class="msg-avatar">🤖</div>
+      <div class="msg-text">
+        ¡Hola! Soy el motor de IA de <strong>San Isidro Digital</strong>. ¿En qué puedo orientarte?<br><br>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+          <button style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); color:#38bdf8; padding:6px 10px; border-radius:12px; font-size:11px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.1)'" onclick="setPublicInput('Consultar CLAP')">📦 CLAP</button>
+          <button style="background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3); color:#a78bfa; padding:6px 10px; border-radius:12px; font-size:11px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(167,139,250,0.2)'" onmouseout="this.style.background='rgba(167,139,250,0.1)'" onclick="setPublicInput('Requisitos Trámites')">📝 Trámites</button>
+          <button style="background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.3); color:#34d399; padding:6px 10px; border-radius:12px; font-size:11px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(52,211,153,0.2)'" onmouseout="this.style.background='rgba(52,211,153,0.1)'" onclick="setPublicInput('Cursos y Talleres')">🎓 Cursos</button>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="chat-footer">
     <input type="text" id="publicChatInput" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter')sendPublicMsg()">
@@ -607,366 +414,218 @@
 <div class="notif" id="notif"></div>
 
 <script>
-// DATA
-const STORAGE_KEY = 'san_isidro_data';
+// --- CONFIGURACIÓN DE ENTORNO ---
+// Cambia esta variable a la URL de tu backend en producción (ej. https://sanisidro-backend.onrender.com)
+const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? 'http://localhost:3001'
+  : 'AQUI_PON_LA_URL_DE_PRODUCCION';
 
-// Users - Solo Admin
-const ADMIN_USERS = { 'admin@sanisidro.gob.ve': {password:'admin123',rol:'administrador',nombre:'Admin'}, 'admin': {password:'admin123',rol:'administrador',nombre:'Admin'} };
+// FIN DATA
 
-function getData() {
-  const d = localStorage.getItem(STORAGE_KEY);
-  return d ? JSON.parse(d) : { solicitudes: [], clap: [], emprendimientos: [], proyectos: [] };
+async function loadNoticiasPublicas() {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/noticias/public`);
+    const data = await res.json();
+    const container = document.getElementById('public-noticias');
+    if (!data.length) {
+      container.innerHTML = '<div style="text-align:center; color:var(--text2); grid-column:1/-1; padding:30px;">No hay anuncios recientes publicados.</div>';
+      return;
+    }
+    container.innerHTML = data.map(n => `
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;">
+          <span style="font-size:11px; font-weight:700; color: ${n.tipo==='Asamblea'?'#a78bfa':n.tipo==='Salud'?'#38bdf8':n.tipo==='Alerta'?'#f87171':'var(--accent5)'}; text-transform:uppercase; letter-spacing:1px; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px;">
+            ${n.tipo}
+          </span>
+          <span style="font-size:11px; color:var(--text2); font-weight:600;">${new Date(n.fecha).toLocaleDateString()}</span>
+        </div>
+        <h4 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text); line-height:1.3;">${n.titulo}</h4>
+        <p style="font-size:13px; color:var(--text2); line-height:1.6; white-space:pre-wrap;">${n.contenido}</p>
+      </div>
+    `).join('');
+  } catch (e) {
+    const container = document.getElementById('public-noticias');
+    if(container) container.innerHTML = '<div style="text-align:center; color:var(--text2); grid-column:1/-1; padding:30px;">Error al conectar con la base de datos de noticias.</div>';
+  }
 }
-
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  updateStats();
-}
-
-function updateStats() {
-  const d = getData();
-  document.getElementById('stat-sol').textContent = d.solicitudes.length;
-  document.getElementById('stat-clap').textContent = d.clap.length;
-  document.getElementById('stat-empr').textContent = d.emprendimientos.length;
-  document.getElementById('stat-proy').textContent = d.proyectos.length;
-  document.getElementById('cnt-sol').textContent = d.solicitudes.length;
-  document.getElementById('cnt-clap').textContent = d.clap.length;
-  document.getElementById('cnt-empr').textContent = d.emprendimientos.length;
-  document.getElementById('cnt-proy').textContent = d.proyectos.length;
-  document.getElementById('mod-sol').textContent = d.solicitudes.length;
-  document.getElementById('mod-empr').textContent = d.emprendimientos.length;
-  document.getElementById('mod-proy').textContent = d.proyectos.length;
-  document.getElementById('imp1').textContent = d.solicitudes.length;
-  document.getElementById('imp2').textContent = d.emprendimientos.length;
-  document.getElementById('imp3').textContent = d.proyectos.length;
-  
-  // Activity
-  const acts = [...d.solicitudes.slice(-2).map(s=>'📋 ' + s.nombre), ...d.clap.slice(-2).map(c=>'📦 ' + c.nombre), ...d.emprendimientos.slice(-2).map(e=>'💡 ' + e.nombre)].reverse();
-  document.getElementById('activityFeed').innerHTML = acts.length ? acts.map(a=>'<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)">' + a + '</div>').join('') : 'Sin actividad';
-}
+window.addEventListener('DOMContentLoaded', loadNoticiasPublicas);
 
 // PORTAL FUNCTIONS
-function showService(service) {
-  document.getElementById('portal').style.display = 'none';
-  document.getElementById('servicesDetail').classList.add('active');
-  document.querySelectorAll('.service-panel').forEach(p => p.style.display = 'none');
-  document.getElementById('panel-' + service).style.display = 'block';
-  window.scrollTo(0,0);
+function handleFeature(service) {
+  if (service === 'solicitudes') {
+    document.getElementById('contact-type').value = 'Trámite Administrativo';
+    document.getElementById('contacto-portal').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => document.getElementById('contact-name').focus(), 600);
+  } else if (service === 'clap') {
+    document.querySelector('.consulta-section').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => document.getElementById('consulta-cedula').focus(), 600);
+  } else if (service === 'emprendimientos') {
+    document.getElementById('contact-type').value = 'Emprendimiento / Proyecto';
+    document.getElementById('contacto-portal').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => document.getElementById('contact-name').focus(), 600);
+  } else if (service === 'proyectos') {
+    document.getElementById('public-noticias').scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
-function hideServices() {
-  document.getElementById('servicesDetail').classList.remove('active');
-  document.getElementById('portal').style.display = 'flex';
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  if (n) {
+    n.textContent = msg;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 3000);
+  } else {
+    alert(msg);
+  }
 }
 
-function sendContact() {
+async function sendContact() {
   const name = document.getElementById('contact-name').value.trim();
+  const cedula = document.getElementById('contact-cedula').value.trim();
   const msg = document.getElementById('contact-msg').value.trim();
-  if (!name || !msg) { showNotif('Completa todos los campos'); return; }
-  const d = getData();
-  d.solicitudes.push({
-    nombre: name,
-    tipo: document.getElementById('contact-type').value,
-    descripcion: msg,
-    telefono: document.getElementById('contact-phone').value,
-    email: document.getElementById('contact-email').value,
-    estado: 'Pendiente',
-    fecha: new Date().toISOString()
-  });
-  saveData(d);
-  showNotif('Mensaje enviado correctamente');
-  document.getElementById('contact-name').value = '';
-  document.getElementById('contact-phone').value = '';
-  document.getElementById('contact-email').value = '';
-  document.getElementById('contact-msg').value = '';
+  const phone = document.getElementById('contact-phone').value.trim();
+  const email = document.getElementById('contact-email').value.trim();
+  const tipo = document.getElementById('contact-type').value;
+
+  if (!name || !msg) { showNotif('⚠️ Falta ingresar tu Nombre o Descripción en el chat'); return; }
+  
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/public/contacto`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre: name, cedula, telefono: phone, email, tipo, descripcion: msg })
+    });
+    if (!res.ok) throw new Error('Error al enviar la solicitud');
+    
+    showNotif('Mensaje enviado correctamente');
+    document.getElementById('contact-name').value = '';
+    document.getElementById('contact-cedula').value = '';
+    document.getElementById('contact-phone').value = '';
+    document.getElementById('contact-email').value = '';
+    document.getElementById('contact-msg').value = '';
+  } catch (error) {
+    showNotif('⚠️ No se pudo enviar el mensaje.');
+    console.error(error);
+  }
 }
 
-function consultarCedula() {
+async function consultarCedula() {
   const cedula = document.getElementById('consulta-cedula').value.trim();
   if (!cedula) { showNotif('Ingresa tu número de cédula'); return; }
   
-  const d = getData();
-  let html = '';
-  
-  // Buscar en solicitudes
-  const sols = d.solicitudes.filter(s => s.cedula === cedula || s.telefono?.includes(cedula));
-  if (sols.length) {
-    html += '<h4 style="margin:20px 0 12px;color:var(--accent2)">📋 Tus Solicitudes</h4>';
-    sols.forEach(s => {
-      const badgeClass = s.estado === 'Pendiente' ? 'pendiente' : s.estado === 'Aprobado' || s.estado === 'Atendido' ? 'aprobado' : 'entregado';
-      html += `<div class="result-card">
-        <div class="result-header">
-          <div class="result-title">${s.nombre || 'Solicitud'}</div>
-          <div class="result-badge ${badgeClass}">${s.estado}</div>
-        </div>
-        <div class="result-detail">
-          <strong>Tipo:</strong> ${s.tipo || 'No especificado'}<br>
-          <strong>Descripción:</strong> ${s.descripcion || 'Sin descripción'}<br>
-          ${s.fecha ? '<strong>Fecha:</strong> ' + new Date(s.fecha).toLocaleDateString() : ''}
-        </div>
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/public/consulta/${cedula}`);
+    if (!res.ok) throw new Error('Error al consultar');
+    const data = await res.json();
+    
+    let html = '';
+    
+    // Buscar en solicitudes
+    if (data.solicitudes && data.solicitudes.length) {
+      html += '<h4 style="margin:20px 0 12px;color:var(--accent2)">📋 Tus Solicitudes</h4>';
+      data.solicitudes.forEach(s => {
+        const badgeClass = s.estado === 'Pendiente' ? 'pendiente' : s.estado === 'Aprobado' || s.estado === 'Atendido' ? 'aprobado' : 'entregado';
+        html += `<div class="result-card">
+          <div class="result-header">
+            <div class="result-title">${s.nombre || 'Solicitud'}</div>
+            <div class="result-badge ${badgeClass}">${s.estado}</div>
+          </div>
+          <div class="result-detail">
+            <strong>Tipo:</strong> ${s.tipo || 'No especificado'}<br>
+            <strong>Descripción:</strong> ${s.descripcion || 'Sin descripción'}<br>
+            ${s.fecha ? '<strong>Fecha:</strong> ' + new Date(s.fecha).toLocaleDateString() : ''}
+          </div>
+        </div>`;
+      });
+    }
+    
+    // Buscar en CLAP
+    if (data.clap && data.clap.length) {
+      html += '<h4 style="margin:20px 0 12px;color:var(--accent2)">📦 Tus Beneficios CLAP</h4>';
+      data.clap.forEach(c => {
+        html += `<div class="result-card">
+          <div class="result-header">
+            <div class="result-title">${c.nombre}</div>
+            <div class="result-badge entregado">${c.estado}</div>
+          </div>
+          <div class="result-detail">
+            <strong>Tipo:</strong> ${c.tipo || 'Caja CLAP'}<br>
+            <strong>Cantidad:</strong> ${c.cantidad || 1}
+          </div>
+        </div>`;
+      });
+    }
+    
+    // Buscar en Emprendimientos
+    if (data.emprendimientos && data.emprendimientos.length) {
+      html += '<h4 style="margin:20px 0 12px;color:var(--accent2)">💡 Tu Emprendimiento</h4>';
+      data.emprendimientos.forEach(e => {
+        html += `<div class="result-card">
+          <div class="result-header">
+            <div class="result-title">${e.nombre}</div>
+            <div class="result-badge aprobado">${e.estado}</div>
+          </div>
+          <div class="result-detail">
+            <strong>Categoría:</strong> ${e.categoria || 'No especificada'}<br>
+            <strong>Responsable:</strong> ${e.responsable || 'No especificado'}
+          </div>
+        </div>`;
+      });
+    }
+    
+    if (!html) {
+      html = `<div class="result-empty">
+        <div style="font-size:48px;margin-bottom:16px">🔍</div>
+        <div style="font-size:18px;margin-bottom:8px">No encontramos registros</div>
+        <div style="color:var(--text2)">No tenemos registros asociados a esta cédula. Verifica que esté correcta o contacta al consejo comunal.</div>
       </div>`;
-    });
+    }
+    
+    document.getElementById('consultaContent').innerHTML = html;
+    document.getElementById('consultaResult').classList.add('active');
+  } catch (error) {
+    showNotif('⚠️ No se pudo conectar con la base de datos.');
+    console.error(error);
   }
-  
-  // Buscar en CLAP
-  const claps = d.clap.filter(c => c.cedula === cedula || c.telefono?.includes(cedula));
-  if (claps.length) {
-    html += '<h4 style="margin:20px 0 12px;color:var(--accent2)">📦 Tus Beneficios CLAP</h4>';
-    claps.forEach(c => {
-      html += `<div class="result-card">
-        <div class="result-header">
-          <div class="result-title">${c.nombre}</div>
-          <div class="result-badge entregado">${c.estado}</div>
-        </div>
-        <div class="result-detail">
-          <strong>Tipo:</strong> ${c.tipo || 'Caja CLAP'}<br>
-          <strong>Cantidad:</strong> ${c.cantidad || 1}
-        </div>
-      </div>`;
-    });
-  }
-  
-  // Buscar en Emprendimientos
-  const emps = d.emprendimientos.filter(e => e.cedula === cedula || e.telefono?.includes(cedula));
-  if (emps.length) {
-    html += '<h4 style="margin:20px 0 12px;color:var(--accent2)">💡 Tu Emprendimiento</h4>';
-    emps.forEach(e => {
-      html += `<div class="result-card">
-        <div class="result-header">
-          <div class="result-title">${e.nombre}</div>
-          <div class="result-badge aprobado">${e.estado}</div>
-        </div>
-        <div class="result-detail">
-          <strong>Categoría:</strong> ${e.categoria || 'No especificada'}<br>
-          <strong>Responsable:</strong> ${e.responsable || 'No especificado'}
-        </div>
-      </div>`;
-    });
-  }
-  
-  // Buscar en Proyectos (si el usuario está registrado como beneficiario)
-  const proyBenef = d.proyectos.filter(p => p.beneficiarios?.includes(cedula));
-  if (proyBenef.length) {
-    html += '<h4 style="margin:20px 0 12px;color:var(--accent2)">🏘 Proyectos en los que participas</h4>';
-    proyBenef.forEach(p => {
-      html += `<div class="result-card">
-        <div class="result-header">
-          <div class="result-title">${p.nombre}</div>
-          <div class="result-badge aprobado">${p.estado}</div>
-        </div>
-        <div class="result-detail">
-          <strong>Tipo:</strong> ${p.tipo || 'No especificado'}<br>
-          <strong>Sector:</strong> ${p.sector || 'No especificado'}
-        </div>
-      </div>`;
-    });
-  }
-  
-  if (!html) {
-    html = `<div class="result-empty">
-      <div style="font-size:48px;margin-bottom:16px">🔍</div>
-      <div style="font-size:18px;margin-bottom:8px">No encontramos registros</div>
-      <div style="color:var(--text2)">No tenemos registros asociados a esta cédula. Verifica que esté correcta o contacta al consejo comunal.</div>
-    </div>`;
-  }
-  
-  document.getElementById('consultaContent').innerHTML = html;
-  document.getElementById('consultaResult').classList.add('active');
 }
 
-// AUTH
-let currentUser = localStorage.getItem('currentUser');
-let userRol = localStorage.getItem('userRol');
-
-function isAdmin() { return userRol === 'administrador'; }
-
-function updatePermissions() {
-  const btns = document.querySelectorAll('.btn-primary');
-  btns.forEach(btn => {
-    if (!isAdmin()) {
-      btn.style.display = 'none';
-    }
-  });
-  const headers = document.querySelectorAll('.header-actions');
-  headers.forEach(h => {
-    if (!isAdmin()) {
-      h.style.display = 'none';
-    }
-  });
-}
-
+// AUTH Y LOGIN
 function showLogin() { document.getElementById('loginModal').classList.add('active'); }
 function hideLogin() { document.getElementById('loginModal').classList.remove('active'); document.getElementById('loginError').style.display = 'none'; }
 
-function doLogin() {
+async function doLogin() {
   const user = document.getElementById('loginUser').value.trim().toLowerCase();
   const pass = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
   if (!user || !pass) { err.textContent = 'Completa todos los campos'; err.style.display = 'block'; return; }
-  if (ADMIN_USERS[user] && ADMIN_USERS[user].password === pass) {
-    currentUser = ADMIN_USERS[user].nombre; userRol = 'administrador';
-    localStorage.setItem('currentUser', currentUser); localStorage.setItem('userRol', userRol);
-    hideLogin(); showAdmin(); return;
+  
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user, password: pass })
+    });
+    if (!res.ok) throw new Error('Credenciales inválidas');
+    const data = await res.json();
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.usuario));
+    window.location.replace('/');
+  } catch (e) {
+    err.textContent = 'Credenciales inválidas'; err.style.display = 'block';
   }
-  err.textContent = 'Credenciales inválidas'; err.style.display = 'block';
-}
-
-function logout() { localStorage.removeItem('currentUser'); localStorage.removeItem('userRol'); location.reload(); }
-
-function showAdmin() {
-  document.getElementById('portal').style.display = 'none';
-  document.getElementById('adminPanel').classList.add('active');
-  document.getElementById('userPill').textContent = '👤 Admin';
-  updateStats();
-  updatePermissions();
-}
-
-function simplifyUserPanel() {
-  const nav = document.querySelector('.sidebar');
-  nav.innerHTML = `
-    <div class="logo-area">
-      <div class="logo-badge" style="background:linear-gradient(135deg,#34d399,#10b981)"><span style="font-size:20px">👤</span><div class="logo-title">San Isidro<br>Digital</div></div>
-      <div class="logo-sub">Panel de Usuario</div>
-    </div>
-    <div style="flex:1;overflow-y:auto;">
-      <div class="nav-section">
-        <div class="nav-label">Mi Comunidad</div>
-        <div class="nav-item active" data-view="mis-solicitudes">📋 Mis Solicitudes</div>
-        <div class="nav-item" data-view="nueva-solicitud">➕ Nueva Solicitud</div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-label">Información</div>
-        <div class="nav-item" data-view="ver-clap">📦 Ver CLAP</div>
-        <div class="nav-item" data-view="ver-emprendimientos">💡 Ver Emprendimientos</div>
-        <div class="nav-item" data-view="ver-proyectos">🏘 Ver Proyectos</div>
-      </div>
-    </div>
-    <div class="sidebar-footer">
-      <button class="asistente-btn" data-view="chat">✨ Asistente IA</button>
-      <button class="logout-btn" onclick="logout()">🚪 Cerrar Sesión</button>
-    </div>
-  `;
-  document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => showView(el.dataset.view)));
-}
-
-if (currentUser && userRol) showAdmin(); else updateStats();
-
-// NAV
-document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => showView(el.dataset.view)));
-document.querySelectorAll('.module-card[data-view]').forEach(el => el.addEventListener('click', () => showView(el.dataset.view)));
-
-function showView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('view-' + id).classList.add('active');
-  document.querySelectorAll(`.nav-item[data-view="${id}"]`).forEach(n => n.classList.add('active'));
-  const titles = { dashboard:'Dashboard', solicitudes:'Solicitudes', recursos:'Recursos CLAP', emprendimientos:'Emprendimientos', proyectos:'Proyectos', capacitacion:'Capacitación', salud:'Salud', ubicacion:'Ubicación', info:'Información', chat:'Asistente IA' };
-  document.getElementById('pageTitle').textContent = titles[id] || id;
-  if (id !== 'dashboard') renderTable(id);
-}
-
-function toggleForm(id) { document.getElementById(id).style.display = document.getElementById(id).style.display === 'none' ? 'block' : 'none'; }
-
-// CRUD
-function addData(type) {
-  if (!isAdmin()) { showNotif('Solo el administrador puede crear registros'); return; }
-  const fields = { solicitudes: ['cedula', 'nombre', 'tipo', 'desc'], clap: ['cedula', 'nombre', 'tipo', 'cant'], emprendimientos: ['cedula', 'nombre', 'persona', 'cat'], proyectos: ['nombre', 'sector', 'tipo'] };
-  const data = {};
-  fields[type].forEach(f => {
-    const el = document.getElementById(type + '-' + f);
-    if (el) data[f === 'desc' ? 'descripcion' : f === 'persona' ? 'responsable' : f === 'cat' ? 'categoria' : f] = el.value;
-  });
-  if (!data.nombre) { showNotif('Completa los campos'); return; }
-  const d = getData();
-  if (type === 'solicitudes') d.solicitudes.push({...data, estado:'Pendiente', fecha: new Date().toISOString()});
-  else if (type === 'clap') d.clap.push({...data, cantidad:data.cantidad||1, estado:'Entregado'});
-  else if (type === 'emprendimientos') d.emprendimientos.push({...data, estado:'Activo'});
-  else if (type === 'proyectos') d.proyectos.push({...data, estado:'En Curso'});
-  saveData(d); renderTable(type); showNotif('Registrado'); fields[type].forEach(f => { const el = document.getElementById(type + '-' + f); if(el) el.value = ''; }); toggleForm('form' + type.charAt(0).toUpperCase() + type.slice(1));
-}
-
-function renderTable(type) {
-  const d = getData();
-  const tbody = document.getElementById('tabla' + (type === 'clap' ? 'Clap' : type.charAt(0).toUpperCase() + type.slice(1)));
-  const data = d[type];
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:30px">Sin registros</td></tr>'; return; }
-  const estadoClass = {Pendiente:'tag-p',Activo:'tag-a','En Curso':'tag-a',Entregado:'tag-a'};
-  tbody.innerHTML = data.map((r,i) => {
-    let cols = '';
-    if (type === 'solicitudes') cols = `<td>${r.cedula||'-'}</td><td>${r.nombre}</td><td>${r.tipo}</td><td>${r.descripcion}</td><td><span class="tag ${estadoClass[r.estado]||'tag-p'}">${r.estado}</span></td>`;
-    else if (type === 'clap') cols = `<td>${r.cedula||'-'}</td><td>${r.nombre}</td><td>${r.tipo}</td><td>${r.cantidad}</td><td><span class="tag tag-a">${r.estado}</span></td>`;
-    else if (type === 'emprendimientos') cols = `<td>${r.cedula||'-'}</td><td>${r.nombre}</td><td>${r.responsable}</td><td>${r.categoria}</td><td><span class="tag tag-a">${r.estado}</span></td>`;
-    else if (type === 'proyectos') cols = `<td>${r.nombre}</td><td>${r.sector}</td><td>${r.tipo}</td><td><span class="tag tag-a">${r.estado}</span></td>`;
-    return `<tr><td style="color:var(--text3)">${String(i+1).padStart(3,'0')}</td>${cols}</tr>`;
-  }).join('');
-}
-
-function showNotif(msg) { const n = document.getElementById('notif'); n.textContent = msg; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),3000); }
-
-function userAddSolicitud() {
-  const nombre = document.getElementById('user-sol-nombre').value.trim();
-  const tipo = document.getElementById('user-sol-tipo').value;
-  const desc = document.getElementById('user-sol-desc').value.trim();
-  if (!nombre || !desc) { showNotif('Completa todos los campos'); return; }
-  const d = getData();
-  d.solicitudes.push({ nombre, tipo, descripcion: desc, estado: 'Pendiente', fecha: new Date().toISOString(), usuario: currentUser });
-  saveData(d);
-  showNotif('Solicitud enviada ✓');
-  document.getElementById('user-sol-nombre').value = '';
-  document.getElementById('user-sol-desc').value = '';
-}
-
-function renderUserSolicitudes() {
-  const d = getData();
-  const misSol = d.solicitudes.filter(s => s.usuario === currentUser);
-  const tbody = document.getElementById('tablaMisSolicitudes');
-  if (!misSol.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:30px">No tienes solicitudes</td></tr>'; return; }
-  const estadoClass = {Pendiente:'tag-p',Atendido:'tag-a',Rechazado:'tag-r'};
-  tbody.innerHTML = misSol.map((s,i) => `<tr><td style="color:var(--text3)">${String(i+1).padStart(3,'0')}</td><td>${s.nombre}</td><td>${s.tipo}</td><td>${s.descripcion}</td><td><span class="tag ${estadoClass[s.estado]||'tag-p'}">${s.estado}</span></td></tr>`).join('');
-}
-
-function renderVerTable(type, tbodyId) {
-  const d = getData();
-  const tbody = document.getElementById(tbodyId);
-  const data = d[type];
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:30px">Sin registros</td></tr>'; return; }
-  tbody.innerHTML = data.map((r,i) => {
-    let cols = '';
-    if (type === 'clap') cols = `<td>${r.nombre}</td><td>${r.tipo}</td><td>${r.cantidad}</td><td><span class="tag tag-a">${r.estado}</span></td>`;
-    else if (type === 'emprendimientos') cols = `<td>${r.nombre}</td><td>${r.responsable}</td><td>${r.categoria}</td><td><span class="tag tag-a">${r.estado}</span></td>`;
-    else if (type === 'proyectos') cols = `<td>${r.nombre}</td><td>${r.sector}</td><td>${r.tipo}</td><td><span class="tag tag-a">${r.estado}</span></td>`;
-    return `<tr><td style="color:var(--text3)">${String(i+1).padStart(3,'0')}</td>${cols}</tr>`;
-  }).join('');
 }
 
 // CHAT - IMPROVED
-const GROQ_KEY = '';
 
-const SYSTEM_PROMPT = `Eres el Asistente Virtual de San Isidro Digital, un sistema de gestión comunitaria del Consejo Comunal San Isidro en Venezuela.
 
-INFORMACIÓN DEL CONSEJO:
-- Ubicación: Comunidad en el corazón del municipio, sectores: Norte, Sur, Centro, Las Palmas, El Mirador
-- Población: ~45,000 habitantes
-- Fundación: 1950
-- Servicios: Solicitudes ciudadanas, Recursos CLAP, Emprendimientos sociales, Proyectos comunitarios, Capacitación técnica, Salud comunitaria
 
-TEMAS QUE PUEDES RESPONDER:
-1. SOLICITUDES: Trámites administrativos, ayuda social, reclamos de servicios, información general
-2. RECURSOS CLAP: Cajas alimentarias, kit de medicamentos, material escolar, apoyo económico
-3. EMPRENDIMIENTOS: Incubadora de negocios locales (alimentos, artesanía, servicios, educación)
-4. PROYECTOS: Infraestructura, ambiente, educación, salud, cultura
-5. CAPACITACIÓN: Tecnología digital, oficios, gestión y liderazgo
-6. SALUD: Jornadas de vacunación, odontología, salud mental
-7. UBICACIÓN: Dirección de la sede, sectores Coveredos
-
-REGLAS:
-- Responde siempre en español de manera amable y clara
-- Máximo 2-3 párrafos por respuesta
-- Si no sabes algo específico, sugiere visitar la sede del consejo
-- Ofrece orientación general para trámites y servicios
-- Da la bienvenida y sé servicial`;
 
 // PUBLIC CHAT FUNCTIONS
+function setPublicInput(txt) {
+  document.getElementById('publicChatInput').value = txt;
+  sendPublicMsg();
+}
+
 function togglePublicChat() {
   document.getElementById('publicChat').classList.toggle('active');
 }
@@ -985,20 +644,15 @@ async function sendPublicMsg() {
   msgs.scrollTop = msgs.scrollHeight;
   
   try {
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const resp = await fetch(`${BACKEND_URL}/api/public/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: text }
-        ],
-        max_tokens: 500
+        messages: [{ role: 'user', content: text }]
       })
     });
     const d = await resp.json();
-    const reply = d.choices?.[0]?.message?.content || 'Lo siento, no pude procesar tu consulta. Intenta de nuevo.';
+    const reply = d.reply || 'Lo siento, no pude procesar tu consulta. Intenta de nuevo.';
     document.getElementById(typingId).outerHTML = `<div class="msg-pub ai"><div class="msg-avatar">🤖</div><div class="msg-text">${reply.replace(/\n/g, '<br>')}</div></div>`;
   } catch(e) {
     document.getElementById(typingId).outerHTML = `<div class="msg-pub ai"><div class="msg-avatar">🤖</div><div class="msg-text">⚠️ Error de conexión. Intenta de nuevo.</div></div>`;
@@ -1018,9 +672,9 @@ async function sendMsg() {
   msgs.innerHTML += `<div class="msg ai" id="${typingId}"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
   msgs.scrollTop = msgs.scrollHeight;
   try {
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` }, body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: text }], max_tokens: 500 }) });
+    const resp = await fetch(`${BACKEND_URL}/api/public/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content: text }] }) });
     const d = await resp.json();
-    const reply = d.choices?.[0]?.message?.content || 'Lo siento.';
+    const reply = d.reply || 'Lo siento.';
     document.getElementById(typingId).outerHTML = `<div class="msg ai"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble">${reply.replace(/\n/g, '<br>')}</div></div>`;
   } catch(e) { document.getElementById(typingId).outerHTML = `<div class="msg ai"><div class="msg-avatar avatar-ai">🤖</div><div class="msg-bubble">⚠️ Error</div></div>`; }
   msgs.scrollTop = msgs.scrollHeight;

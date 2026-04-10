@@ -1,119 +1,135 @@
 import { useState, useEffect } from 'react'
 import { api } from '../services/api'
+import { exportToExcel, exportToPDF } from '../utils/export'
 
-const TIPOS = ['Vialidad/Calle Dañada', 'Infraestructura General', 'Ambiente y Ecología', 'Educación Comunitaria', 'Salud Pública', 'Cultura y Recreación']
-const ESTADOS = { 'En Planificación': { bg: 'rgba(147,51,234,0.15)', color: '#a855f7' }, 'En Curso': { bg: 'rgba(2,132,199,0.15)', color: '#38bdf8' }, 'Completado': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' }, 'Pausado': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' } }
+const TAMAÑOS = ['10Kg', '18Kg', '27Kg', '43Kg']
+const ESTADOS = { 'Pendiente': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' }, 'Entregado': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' }, 'Vacío': { bg: 'rgba(100,116,139,0.15)', color: '#94a3b8' } }
 
-export default function Proyectos() {
-  const [proyectos, setProyectos] = useState([])
+const columnas = [
+  { header: '#', accessor: (_, i) => i + 1 },
+  { header: 'Responsable', accessor: item => item.responsable },
+  { header: 'Cédula', accessor: item => item.cedula },
+  { header: 'Cilindro', accessor: item => item.tamano },
+  { header: 'Cant.', accessor: item => item.cantidad },
+  { header: 'Estado', accessor: item => item.estado },
+  { header: 'Pagado', accessor: item => item.pagado ? 'Sí' : 'No' }
+]
+
+export default function Gas() {
+  const [gas, setGas] = useState([])
   const [loading, setLoading] = useState(true)
   const [mostrarForm, setMostrarForm] = useState(false)
   const [notif, setNotif] = useState('')
-  const [form, setForm] = useState({ titulo: '', descripcion: '', tipo: 'Vialidad/Calle Dañada', sector: '', presupuesto: '' })
+  const [form, setForm] = useState({ responsable: '', cedula: '', tamano: '10Kg', cantidad: 1 })
 
   useEffect(() => { fetchData() }, [])
 
   async function fetchData() {
     try {
-      const data = await api.proyectos.list()
-      setProyectos(data)
+      const data = await api.gas.list()
+      setGas(data)
     } catch (e) { mostrarNotif('Error: ' + e.message) }
     finally { setLoading(false) }
   }
 
-  function handleChange(e) { setForm({ ...form, [e.target.name]: e.target.value }) }
+  function handleChange(e) { setForm({ ...form, [e.target.name]: e.target.name === 'cantidad' ? parseInt(e.target.value) : e.target.value }) }
 
   async function agregar() {
-    if (!form.titulo.trim() || !form.sector.trim()) { mostrarNotif('⚠️ Completa los campos requeridos'); return }
+    if (!form.responsable.trim() || !form.cedula.trim()) { mostrarNotif('⚠️ Completa los campos requeridos'); return }
     try {
-      await api.proyectos.create({...form, presupuesto: parseFloat(form.presupuesto) || 0})
-      setForm({ titulo: '', descripcion: '', tipo: 'Vialidad/Calle Dañada', sector: '', presupuesto: '' })
+      await api.gas.create(form)
+      setForm({ responsable: '', cedula: '', tamano: '10Kg', cantidad: 1 })
       setMostrarForm(false)
       fetchData()
-      mostrarNotif('✅ Proyecto registrado')
+      mostrarNotif('✅ Cilindro registrado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   async function actualizarCampo(id, campo, valor) {
     try {
-      await api.proyectos.update(id, { [campo]: valor })
+      await api.gas.update(id, { [campo]: valor })
       fetchData()
-      mostrarNotif('✅ Actualizado exitosamente')
+      mostrarNotif('✅ Actualizado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   async function eliminar(id) {
-    if (!confirm('¿Eliminar este proyecto?')) return
+    if (!confirm('¿Eliminar registro?')) return
     try {
-      await api.proyectos.delete(id)
+      await api.gas.delete(id)
       fetchData()
-      mostrarNotif('✅ Proyecto eliminado')
+      mostrarNotif('✅ Eliminado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   function mostrarNotif(msg) { setNotif(msg); setTimeout(() => setNotif(''), 3000) }
 
+  function handleExportExcel() { exportToExcel(gas, 'gas_comunal', columnas); mostrarNotif('✅ Excel Generado') }
+  function handleExportPDF() { exportToPDF(gas, 'gas_comunal', columnas, 'Registro de Gas Comunal'); mostrarNotif('✅ PDF Generado') }
+
   return (
     <div>
       <div style={s.header}>
-        <h2 style={s.titulo}>🏘 Proyectos Comunitarios</h2>
-        <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Nuevo Proyecto</button>
+        <h2 style={s.titulo}>🛢️ Control de Gas Comunal</h2>
+        <div style={s.actions}>
+          <button style={s.btnExport} onClick={handleExportExcel}>📊 Excel</button>
+          <button style={s.btnExport} onClick={handleExportPDF}>📄 PDF</button>
+          <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Registrar Cilindro</button>
+        </div>
       </div>
 
       {mostrarForm && (
         <div style={s.panel}>
-          <div style={s.panelTitle}>Registrar Proyecto</div>
+          <div style={s.panelTitle}>Nuevo Registro de Gas</div>
           <div style={s.formRow}>
             <div style={s.formGroup}>
-              <label style={s.label}>Título del Proyecto *</label>
-              <input style={s.input} name="titulo" value={form.titulo} onChange={handleChange} placeholder="Nombre del proyecto" />
+              <label style={s.label}>Responsable (Jefe de familia) *</label>
+              <input style={s.input} name="responsable" value={form.responsable} onChange={handleChange} placeholder="Nombre completo" />
             </div>
             <div style={s.formGroup}>
-              <label style={s.label}>Sector *</label>
-              <input style={s.input} name="sector" value={form.sector} onChange={handleChange} placeholder="Sector/Comunidad" />
+              <label style={s.label}>Cédula *</label>
+              <input style={s.input} name="cedula" value={form.cedula} onChange={handleChange} placeholder="V-12345678" />
             </div>
           </div>
           <div style={s.formRow}>
             <div style={s.formGroup}>
-              <label style={s.label}>Tipo de Proyecto</label>
-              <select style={s.input} name="tipo" value={form.tipo} onChange={handleChange}>
-                {TIPOS.map(t => <option key={t}>{t}</option>)}
+              <label style={s.label}>Tamaño del Cilindro</label>
+              <select style={s.input} name="tamano" value={form.tamano} onChange={handleChange}>
+                {TAMAÑOS.map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
             <div style={s.formGroup}>
-              <label style={s.label}>Presupuesto Usado ($)</label>
-              <input style={s.input} type="number" name="presupuesto" value={form.presupuesto} onChange={handleChange} placeholder="Ej. 1500" />
+              <label style={s.label}>Cantidad</label>
+              <input style={s.input} name="cantidad" type="number" min="1" value={form.cantidad} onChange={handleChange} />
             </div>
           </div>
-          <div style={s.formGroup}>
-            <label style={s.label}>Descripción</label>
-            <textarea style={{ ...s.input, minHeight: 90, resize: 'vertical' }} name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Describe el proyecto..." />
-          </div>
-          <button style={s.btnPrimary} onClick={agregar}>Registrar Proyecto</button>
+          <button style={s.btnPrimary} onClick={agregar}>Registrar</button>
         </div>
       )}
 
       <div style={s.panel}>
-        {loading ? <div style={s.empty}>Cargando...</div> : proyectos.length === 0 ? (
-          <div style={s.empty}>Sin proyectos registrados</div>
-        ) : (
+        {loading ? <div style={s.empty}>Cargando...</div> : gas.length === 0 ? <div style={s.empty}>Sin registros</div> : (
           <table style={s.table}>
-            <thead><tr>{['#', 'Proyecto', 'Sector', 'Tipo', 'Presupuesto ($)', 'Fecha', 'Estado', 'Acciones'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr></thead>
+            <thead><tr>{['#', 'Responsable', 'Cédula', 'Cilindro', 'Cant.', 'Estado', 'Pago', 'Acciones'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr></thead>
             <tbody>
-              {proyectos.map((p, i) => (
-                <tr key={p.id}>
-                  <td style={{ ...s.td, color: '#6b61a0', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
-                  <td style={s.td}>{p.titulo}</td>
-                  <td style={s.td}>{p.sector}</td>
-                  <td style={s.td}>{p.tipo}</td>
-                  <td style={s.td}>${p.presupuesto ? Number(p.presupuesto).toFixed(2) : '0.00'}</td>
-                  <td style={s.td}>{new Date(p.fecha).toLocaleDateString()}</td>
+              {gas.map((g, i) => (
+                <tr key={g.id}>
+                  <td style={{ ...s.td, color: '#a89fc7', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
+                  <td style={s.td}>{g.responsable}</td>
+                  <td style={s.td}>{g.cedula}</td>
+                  <td style={{...s.td, fontWeight:600}}>{g.tamano}</td>
+                  <td style={s.td}>{g.cantidad}</td>
                   <td style={s.td}>
-                    <select style={{ ...s.tag, background: ESTADOS[p.estado]?.bg || ESTADOS['En Planificación'].bg, color: ESTADOS[p.estado]?.color || ESTADOS['En Planificación'].color }} value={p.estado} onChange={ev => actualizarCampo(p.id, 'estado', ev.target.value)}>
+                    <select style={{ ...s.tag, background: ESTADOS[g.estado]?.bg, color: ESTADOS[g.estado]?.color }} value={g.estado} onChange={ev => actualizarCampo(g.id, 'estado', ev.target.value)}>
                       {Object.keys(ESTADOS).map(est => <option key={est}>{est}</option>)}
                     </select>
                   </td>
-                  <td style={s.td}><button style={s.btnDelete} onClick={() => eliminar(p.id)}>🗑</button></td>
+                  <td style={s.td}>
+                    <button style={{...s.tag, background: g.pagado ? 'rgba(52,211,153,0.15)' : 'rgba(239,68,68,0.15)', color: g.pagado ? '#34d399' : '#ef4444'}} onClick={() => actualizarCampo(g.id, 'pagado', !g.pagado)}>
+                      {g.pagado ? 'Pagado' : 'Deudor'}
+                    </button>
+                  </td>
+                  <td style={s.td}><button style={s.btnDelete} onClick={() => eliminar(g.id)}>🗑</button></td>
                 </tr>
               ))}
             </tbody>

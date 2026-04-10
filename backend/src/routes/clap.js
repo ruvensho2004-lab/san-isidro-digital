@@ -25,6 +25,23 @@ router.post('/', async (req, res) => {
   }
 })
 
+router.patch('/:id', async (req, res) => {
+  try {
+    const { estado, pagado } = req.body
+    const data = {}
+    if (estado !== undefined) data.estado = estado
+    if (pagado !== undefined) data.pagado = pagado
+
+    const recurso = await req.prisma.recursoClap.update({
+      where: { id: parseInt(req.params.id) },
+      data
+    })
+    res.json(recurso)
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+})
+
 router.delete('/:id', async (req, res) => {
   try {
     await req.prisma.recursoClap.delete({

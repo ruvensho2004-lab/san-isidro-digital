@@ -8,12 +8,19 @@ import Emprendimientos from './pages/Emprendimientos'
 import Proyectos from './pages/Proyectos'
 import Usuarios from './pages/Usuarios'
 import Chatbot from './pages/Chatbot'
-import Login from './pages/Login'
 import Perfil from './pages/Perfil'
+import Gas from './pages/Gas'
+import Asambleas from './pages/Asambleas'
+import Salud from './pages/Salud'
+import Noticias from './pages/Noticias'
 
 function ProtectedRoute({ children }) {
   const { token } = useAuth()
-  return token ? children : <Navigate to="/login" />
+  if (!token) {
+    window.location.replace('/portal.html')
+    return null
+  }
+  return children
 }
 
 function AdminRoute({ children }) {
@@ -24,7 +31,7 @@ function AdminRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+
       <Route path="/" element={
         <ProtectedRoute>
           <Layout />
@@ -33,6 +40,9 @@ function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="solicitudes" element={<Solicitudes />} />
         <Route path="clap" element={<RecursosClap />} />
+        <Route path="gas" element={<Gas />} />
+        <Route path="salud" element={<Salud />} />
+        <Route path="asambleas" element={<Asambleas />} />
         <Route path="usuarios" element={
           <AdminRoute><Usuarios /></AdminRoute>
         } />
@@ -41,6 +51,9 @@ function AppRoutes() {
         } />
         <Route path="proyectos" element={
           <AdminRoute><Proyectos /></AdminRoute>
+        } />
+        <Route path="noticias" element={
+          <AdminRoute><Noticias /></AdminRoute>
         } />
         <Route path="perfil" element={<Perfil />} />
         <Route path="chatbot" element={<Chatbot />} />

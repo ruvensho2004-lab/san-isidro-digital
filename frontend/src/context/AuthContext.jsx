@@ -8,8 +8,12 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      const savedUser = localStorage.getItem('user')
-      if (savedUser) setUser(JSON.parse(savedUser))
+      try {
+        const savedUser = localStorage.getItem('user')
+        if (savedUser && savedUser !== 'undefined') setUser(JSON.parse(savedUser))
+      } catch(e) {
+        console.error('Error parseando auth user:', e)
+      }
     }
   }, [token])
 
@@ -28,7 +32,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAdmin: user?.rol === 'admin' }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAdmin: user?.rol === 'admin' || user?.rol === 'administrador' }}>
       {children}
     </AuthContext.Provider>
   )

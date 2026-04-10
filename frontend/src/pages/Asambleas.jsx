@@ -1,22 +1,28 @@
 import { useState, useEffect } from 'react'
 import { api } from '../services/api'
+import { exportToExcel, exportToPDF } from '../utils/export'
 
-const TIPOS = ['Vialidad/Calle Dañada', 'Infraestructura General', 'Ambiente y Ecología', 'Educación Comunitaria', 'Salud Pública', 'Cultura y Recreación']
-const ESTADOS = { 'En Planificación': { bg: 'rgba(147,51,234,0.15)', color: '#a855f7' }, 'En Curso': { bg: 'rgba(2,132,199,0.15)', color: '#38bdf8' }, 'Completado': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' }, 'Pausado': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' } }
+const columnas = [
+  { header: '#', accessor: (_, i) => i + 1 },
+  { header: 'Motivo / Título', accessor: item => item.motivo },
+  { header: 'Asistentes', accessor: item => item.asistentes },
+  { header: 'Vocero Resp.', accessor: item => item.vocero },
+  { header: 'Fecha', accessor: item => new Date(item.fecha).toLocaleDateString() },
+]
 
-export default function Proyectos() {
-  const [proyectos, setProyectos] = useState([])
+export default function Asambleas() {
+  const [asambleas, setAsambleas] = useState([])
   const [loading, setLoading] = useState(true)
   const [mostrarForm, setMostrarForm] = useState(false)
   const [notif, setNotif] = useState('')
-  const [form, setForm] = useState({ titulo: '', descripcion: '', tipo: 'Vialidad/Calle Dañada', sector: '', presupuesto: '' })
+  const [form, setForm] = useState({ motivo: '', asistentes: '', acuerdos: '', vocero: '', enlaceActa: '' })
 
   useEffect(() => { fetchData() }, [])
 
   async function fetchData() {
     try {
-      const data = await api.proyectos.list()
-      setProyectos(data)
+      const data = await api.asambleas.list()
+      setAsambleas(data)
     } catch (e) { mostrarNotif('Error: ' + e.message) }
     finally { setLoading(false) }
   }
@@ -24,96 +30,88 @@ export default function Proyectos() {
   function handleChange(e) { setForm({ ...form, [e.target.name]: e.target.value }) }
 
   async function agregar() {
-    if (!form.titulo.trim() || !form.sector.trim()) { mostrarNotif('⚠️ Completa los campos requeridos'); return }
+    if (!form.motivo.trim() || !form.acuerdos.trim()) { mostrarNotif('⚠️ Completa motivo y acuerdos'); return }
     try {
-      await api.proyectos.create({...form, presupuesto: parseFloat(form.presupuesto) || 0})
-      setForm({ titulo: '', descripcion: '', tipo: 'Vialidad/Calle Dañada', sector: '', presupuesto: '' })
+      await api.asambleas.create(form)
+      setForm({ motivo: '', asistentes: '', acuerdos: '', vocero: '', enlaceActa: '' })
       setMostrarForm(false)
       fetchData()
-      mostrarNotif('✅ Proyecto registrado')
-    } catch (e) { mostrarNotif('Error: ' + e.message) }
-  }
-
-  async function actualizarCampo(id, campo, valor) {
-    try {
-      await api.proyectos.update(id, { [campo]: valor })
-      fetchData()
-      mostrarNotif('✅ Actualizado exitosamente')
+      mostrarNotif('✅ Asamblea y Noticia Pública registradas')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   async function eliminar(id) {
-    if (!confirm('¿Eliminar este proyecto?')) return
+    if (!confirm('¿Eliminar acta de asamblea?')) return
     try {
-      await api.proyectos.delete(id)
+      await api.asambleas.delete(id)
       fetchData()
-      mostrarNotif('✅ Proyecto eliminado')
+      mostrarNotif('✅ Eliminado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   function mostrarNotif(msg) { setNotif(msg); setTimeout(() => setNotif(''), 3000) }
 
+  function handleExportExcel() { exportToExcel(asambleas, 'asambleas', columnas); mostrarNotif('✅ Excel Generado') }
+  function handleExportPDF() { exportToPDF(asambleas, 'asambleas', columnas, 'Registro de Asambleas Comunales'); mostrarNotif('✅ PDF Generado') }
+
   return (
     <div>
       <div style={s.header}>
-        <h2 style={s.titulo}>🏘 Proyectos Comunitarios</h2>
-        <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Nuevo Proyecto</button>
+        <h2 style={s.titulo}>🏛️ Asambleas y Acuerdos</h2>
+        <div style={s.actions}>
+          <button style={s.btnExport} onClick={handleExportExcel}>📊 Excel</button>
+          <button style={s.btnExport} onClick={handleExportPDF}>📄 PDF</button>
+          <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Subir Acta</button>
+        </div>
       </div>
 
       {mostrarForm && (
         <div style={s.panel}>
-          <div style={s.panelTitle}>Registrar Proyecto</div>
+          <div style={s.panelTitle}>Registrar Asamblea</div>
           <div style={s.formRow}>
             <div style={s.formGroup}>
-              <label style={s.label}>Título del Proyecto *</label>
-              <input style={s.input} name="titulo" value={form.titulo} onChange={handleChange} placeholder="Nombre del proyecto" />
+              <label style={s.label}>Motivo de la Asamblea *</label>
+              <input style={s.input} name="motivo" value={form.motivo} onChange={handleChange} placeholder="Ej: Elección de voceros" />
             </div>
             <div style={s.formGroup}>
-              <label style={s.label}>Sector *</label>
-              <input style={s.input} name="sector" value={form.sector} onChange={handleChange} placeholder="Sector/Comunidad" />
+              <label style={s.label}>Cantidad de Asistentes</label>
+              <input style={s.input} name="asistentes" type="number" value={form.asistentes} onChange={handleChange} />
             </div>
           </div>
           <div style={s.formRow}>
             <div style={s.formGroup}>
-              <label style={s.label}>Tipo de Proyecto</label>
-              <select style={s.input} name="tipo" value={form.tipo} onChange={handleChange}>
-                {TIPOS.map(t => <option key={t}>{t}</option>)}
-              </select>
+              <label style={s.label}>Vocero Responsable</label>
+              <input style={s.input} name="vocero" value={form.vocero} onChange={handleChange} placeholder="Nombre del vocero" />
             </div>
             <div style={s.formGroup}>
-              <label style={s.label}>Presupuesto Usado ($)</label>
-              <input style={s.input} type="number" name="presupuesto" value={form.presupuesto} onChange={handleChange} placeholder="Ej. 1500" />
+              <label style={s.label}>Enlace al Acta (PDF/Drive)</label>
+              <input style={s.input} name="enlaceActa" value={form.enlaceActa} onChange={handleChange} placeholder="https://..." />
             </div>
           </div>
           <div style={s.formGroup}>
-            <label style={s.label}>Descripción</label>
-            <textarea style={{ ...s.input, minHeight: 90, resize: 'vertical' }} name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Describe el proyecto..." />
+            <label style={s.label}>Acuerdos Alcanzados * (Esto se publicará en las Noticias)</label>
+            <textarea style={{ ...s.input, minHeight: 80, resize: 'vertical' }} name="acuerdos" value={form.acuerdos} onChange={handleChange} placeholder="Resumen de decisiones..." />
           </div>
-          <button style={s.btnPrimary} onClick={agregar}>Registrar Proyecto</button>
+          <button style={s.btnPrimary} onClick={agregar}>Registrar Asamblea</button>
         </div>
       )}
 
       <div style={s.panel}>
-        {loading ? <div style={s.empty}>Cargando...</div> : proyectos.length === 0 ? (
-          <div style={s.empty}>Sin proyectos registrados</div>
-        ) : (
+        {loading ? <div style={s.empty}>Cargando...</div> : asambleas.length === 0 ? <div style={s.empty}>Sin asambleas registradas</div> : (
           <table style={s.table}>
-            <thead><tr>{['#', 'Proyecto', 'Sector', 'Tipo', 'Presupuesto ($)', 'Fecha', 'Estado', 'Acciones'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr></thead>
+            <thead><tr>{['#', 'Motivo', 'Asistentes', 'Vocero Central', 'Fecha', 'Acta Digital', 'Acciones'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr></thead>
             <tbody>
-              {proyectos.map((p, i) => (
-                <tr key={p.id}>
-                  <td style={{ ...s.td, color: '#6b61a0', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
-                  <td style={s.td}>{p.titulo}</td>
-                  <td style={s.td}>{p.sector}</td>
-                  <td style={s.td}>{p.tipo}</td>
-                  <td style={s.td}>${p.presupuesto ? Number(p.presupuesto).toFixed(2) : '0.00'}</td>
-                  <td style={s.td}>{new Date(p.fecha).toLocaleDateString()}</td>
+              {asambleas.map((a, i) => (
+                <tr key={a.id}>
+                  <td style={{ ...s.td, color: '#a89fc7', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
+                  <td style={{...s.td, fontWeight: 600}}>{a.motivo}</td>
+                  <td style={s.td}>{a.asistentes}</td>
+                  <td style={s.td}>{a.vocero || 'N/A'}</td>
+                  <td style={s.td}>{new Date(a.fecha).toLocaleDateString()}</td>
                   <td style={s.td}>
-                    <select style={{ ...s.tag, background: ESTADOS[p.estado]?.bg || ESTADOS['En Planificación'].bg, color: ESTADOS[p.estado]?.color || ESTADOS['En Planificación'].color }} value={p.estado} onChange={ev => actualizarCampo(p.id, 'estado', ev.target.value)}>
-                      {Object.keys(ESTADOS).map(est => <option key={est}>{est}</option>)}
-                    </select>
+                    {a.enlaceActa ? <a href={a.enlaceActa} target="_blank" rel="noreferrer" style={{color: '#38bdf8', textDecoration: 'none', fontWeight: 600}}>📄 Ver PDF</a> : <span style={{color: '#94a3b8'}}>Sin Acta</span>}
                   </td>
-                  <td style={s.td}><button style={s.btnDelete} onClick={() => eliminar(p.id)}>🗑</button></td>
+                  <td style={s.td}><button style={s.btnDelete} onClick={() => eliminar(a.id)}>🗑</button></td>
                 </tr>
               ))}
             </tbody>

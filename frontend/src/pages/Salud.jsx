@@ -2,146 +2,139 @@ import { useState, useEffect } from 'react'
 import { api } from '../services/api'
 import { exportToExcel, exportToPDF } from '../utils/export'
 
-const CATEGORIAS = ['Alimentos y Bebidas', 'Artesanía', 'Servicios Tecnológicos', 'Salud y Bienestar', 'Educación', 'Agricultura Urbana']
-const ESTADOS = { 'Pendiente': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' }, 'Aprobado': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' }, 'Rechazado': { bg: 'rgba(239,68,68,0.15)', color: '#ef4444' }, 'En Desarrollo': { bg: 'rgba(2,132,199,0.15)', color: '#38bdf8' } }
+const PRIORIDADES = { 'Normal': { bg: 'rgba(56,189,248,0.15)', color: '#38bdf8' }, 'Alta': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' }, 'Emergencia': { bg: 'rgba(239,68,68,0.15)', color: '#ef4444' } }
+const ESTADOS = { 'Revisión': { bg: 'rgba(100,116,139,0.15)', color: '#94a3b8' }, 'Atendido': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' }, 'Rechazado': { bg: 'rgba(239,68,68,0.15)', color: '#ef4444' } }
 
 const columnas = [
   { header: '#', accessor: (_, i) => i + 1 },
-  { header: 'Emprendimiento', accessor: item => item.nombre },
-  { header: 'Responsable', accessor: item => item.responsable },
-  { header: 'Categoría', accessor: item => item.categoria },
-  { header: 'Inversión', accessor: item => `$${item.inversion || 0}` },
+  { header: 'Vulnerable', accessor: item => item.paciente },
+  { header: 'Cédula', accessor: item => item.cedula },
+  { header: 'Diagnóstico', accessor: item => item.diagnostico },
+  { header: 'Requiere', accessor: item => item.ayudaReq },
   { header: 'Estado', accessor: item => item.estado },
 ]
 
-export default function Emprendimientos() {
-  const [emprendimientos, setEmprendimientos] = useState([])
+export default function Salud() {
+  const [casos, setCasos] = useState([])
   const [loading, setLoading] = useState(true)
   const [mostrarForm, setMostrarForm] = useState(false)
   const [notif, setNotif] = useState('')
-  const [form, setForm] = useState({ nombre: '', responsable: '', categoria: 'Alimentos y Bebidas', descripcion: '', inversion: '', cumpleRequisitos: false })
+  const [form, setForm] = useState({ paciente: '', cedula: '', diagnostico: '', ayudaReq: '', prioridad: 'Normal' })
 
   useEffect(() => { fetchData() }, [])
 
   async function fetchData() {
     try {
-      const data = await api.emprendimientos.list()
-      setEmprendimientos(data)
+      const data = await api.salud.list()
+      setCasos(data)
     } catch (e) { mostrarNotif('Error: ' + e.message) }
     finally { setLoading(false) }
   }
 
-  function handleChange(e) { setForm({ ...form, [e.target.name]: e.target.name === 'inversion' ? parseFloat(e.target.value) || null : e.target.value }) }
+  function handleChange(e) { setForm({ ...form, [e.target.name]: e.target.value }) }
 
   async function agregar() {
-    if (!form.nombre.trim() || !form.responsable.trim()) { mostrarNotif('⚠️ Completa los campos requeridos'); return }
+    if (!form.paciente.trim() || !form.diagnostico.trim()) { mostrarNotif('⚠️ Completa campos obligatorios'); return }
     try {
-      await api.emprendimientos.create(form)
-      setForm({ nombre: '', responsable: '', categoria: 'Alimentos y Bebidas', descripcion: '', inversion: '', cumpleRequisitos: false })
+      await api.salud.create(form)
+      setForm({ paciente: '', cedula: '', diagnostico: '', ayudaReq: '', prioridad: 'Normal' })
       setMostrarForm(false)
       fetchData()
-      mostrarNotif('✅ Emprendimiento registrado')
+      mostrarNotif('✅ Caso de salud registrado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   async function actualizarCampo(id, campo, valor) {
     try {
-      await api.emprendimientos.update(id, { [campo]: valor })
+      await api.salud.update(id, { [campo]: valor })
       fetchData()
       mostrarNotif('✅ Actualizado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   async function eliminar(id) {
-    if (!confirm('¿Eliminar este emprendimiento?')) return
+    if (!confirm('¿Eliminar caso de salud?')) return
     try {
-      await api.emprendimientos.delete(id)
+      await api.salud.delete(id)
       fetchData()
-      mostrarNotif('✅ Emprendimiento eliminado')
+      mostrarNotif('✅ Eliminado')
     } catch (e) { mostrarNotif('Error: ' + e.message) }
   }
 
   function mostrarNotif(msg) { setNotif(msg); setTimeout(() => setNotif(''), 3000) }
 
-  function handleExportExcel() {
-    exportToExcel(emprendimientos, 'emprendimientos', columnas)
-    mostrarNotif('✅ Descargando Excel...')
-  }
-
-  function handleExportPDF() {
-    exportToPDF(emprendimientos, 'emprendimientos', columnas, 'Reporte de Emprendimientos')
-    mostrarNotif('✅ Descargando PDF...')
-  }
+  function handleExportExcel() { exportToExcel(casos, 'salud', columnas); mostrarNotif('✅ Excel Generado') }
+  function handleExportPDF() { exportToPDF(casos, 'salud', columnas, 'Casos de Salud Comunitarios'); mostrarNotif('✅ PDF Generado') }
 
   return (
     <div>
       <div style={s.header}>
-        <h2 style={s.titulo}>💡 Emprendimientos</h2>
+        <h2 style={s.titulo}>🚑 Casos de Salud Vulnerable</h2>
         <div style={s.actions}>
           <button style={s.btnExport} onClick={handleExportExcel}>📊 Excel</button>
           <button style={s.btnExport} onClick={handleExportPDF}>📄 PDF</button>
-          <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Nuevo</button>
+          <button style={s.btnPrimary} onClick={() => setMostrarForm(!mostrarForm)}>+ Registrar Paciente</button>
         </div>
       </div>
 
       {mostrarForm && (
         <div style={s.panel}>
-          <div style={s.panelTitle}>Registrar Emprendimiento</div>
+          <div style={s.panelTitle}>Nuevo Caso Vulnerable</div>
           <div style={s.formRow}>
             <div style={s.formGroup}>
-              <label style={s.label}>Nombre *</label>
-              <input style={s.input} name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" />
+              <label style={s.label}>Nombre del Paciente *</label>
+              <input style={s.input} name="paciente" value={form.paciente} onChange={handleChange} placeholder="Juan Pérez" />
             </div>
             <div style={s.formGroup}>
-              <label style={s.label}>Responsable *</label>
-              <input style={s.input} name="responsable" value={form.responsable} onChange={handleChange} placeholder="Responsable" />
+              <label style={s.label}>Cédula (Opcional)</label>
+              <input style={s.input} name="cedula" value={form.cedula} onChange={handleChange} placeholder="V-12345678" />
             </div>
           </div>
           <div style={s.formRow}>
             <div style={s.formGroup}>
-              <label style={s.label}>Categoría</label>
-              <select style={s.input} name="categoria" value={form.categoria} onChange={handleChange}>
-                {CATEGORIAS.map(c => <option key={c}>{c}</option>)}
-              </select>
+              <label style={s.label}>Diagnóstico o Condición Médica *</label>
+              <input style={s.input} name="diagnostico" value={form.diagnostico} onChange={handleChange} placeholder="Ej: Hipertensión severa" />
             </div>
             <div style={s.formGroup}>
-              <label style={s.label}>Inversión ($)</label>
-              <input style={s.input} name="inversion" type="number" value={form.inversion} onChange={handleChange} placeholder="0.00" />
+              <label style={s.label}>Prioridad</label>
+              <select style={s.input} name="prioridad" value={form.prioridad} onChange={handleChange}>
+                <option>Normal</option>
+                <option>Alta</option>
+                <option>Emergencia</option>
+              </select>
             </div>
           </div>
           <div style={s.formGroup}>
-            <label style={s.label}>Descripción</label>
-            <textarea style={{ ...s.input, minHeight: 90, resize: 'vertical' }} name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Describe..." />
+            <label style={s.label}>Ayuda Requerida</label>
+            <textarea style={{ ...s.input, minHeight: 80, resize: 'vertical' }} name="ayudaReq" value={form.ayudaReq} onChange={handleChange} placeholder="Medicamentos, silla de ruedas, atención médica periódica..." />
           </div>
-          <button style={s.btnPrimary} onClick={agregar}>Registrar</button>
+          <button style={s.btnPrimary} onClick={agregar}>Registrar Paciente</button>
         </div>
       )}
 
       <div style={s.panel}>
-        {loading ? <div style={s.empty}>Cargando...</div> : emprendimientos.length === 0 ? (
-          <div style={s.empty}>Sin emprendimientos</div>
-        ) : (
+        {loading ? <div style={s.empty}>Cargando...</div> : casos.length === 0 ? <div style={s.empty}>Sin casos registrados</div> : (
           <table style={s.table}>
-            <thead><tr>{['#', 'Nombre', 'Responsable', 'Categoría', 'Inversión ($)', 'Requisitos', 'Estado', 'Acciones'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr></thead>
+            <thead><tr>{['#', 'Prioridad', 'Paciente', 'Cédula', 'Diagnóstico', 'Ayuda Rq.', 'Estado', 'Acciones'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr></thead>
             <tbody>
-              {emprendimientos.map((e, i) => (
-                <tr key={e.id}>
-                  <td style={{ ...s.td, color: '#6b61a0', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
-                  <td style={s.td}>{e.nombre}</td>
-                  <td style={s.td}>{e.responsable}</td>
-                  <td style={s.td}>{e.categoria}</td>
-                  <td style={s.td}>${e.inversion ? Number(e.inversion).toFixed(2) : '0.00'}</td>
+              {casos.map((c, i) => (
+                <tr key={c.id}>
+                  <td style={{ ...s.td, color: '#a89fc7', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
                   <td style={s.td}>
-                    <button style={{...s.tag, background: e.cumpleRequisitos ? 'rgba(52,211,153,0.15)' : 'rgba(239,68,68,0.15)', color: e.cumpleRequisitos ? '#34d399' : '#ef4444'}} onClick={() => actualizarCampo(e.id, 'cumpleRequisitos', !e.cumpleRequisitos)}>
-                      {e.cumpleRequisitos ? 'Cumple' : 'No Cumple'}
-                    </button>
+                    <select style={{ ...s.tag, background: PRIORIDADES[c.prioridad]?.bg, color: PRIORIDADES[c.prioridad]?.color }} value={c.prioridad} onChange={ev => actualizarCampo(c.id, 'prioridad', ev.target.value)}>
+                      {Object.keys(PRIORIDADES).map(p => <option key={p}>{p}</option>)}
+                    </select>
                   </td>
+                  <td style={{...s.td, fontWeight: 600}}>{c.paciente}</td>
+                  <td style={s.td}>{c.cedula || 'N/A'}</td>
+                  <td style={s.td}>{c.diagnostico}</td>
+                  <td style={s.td}>{c.ayudaReq}</td>
                   <td style={s.td}>
-                    <select style={{ ...s.tag, background: ESTADOS[e.estado]?.bg || ESTADOS.Pendiente.bg, color: ESTADOS[e.estado]?.color || ESTADOS.Pendiente.color }} value={e.estado} onChange={ev => actualizarCampo(e.id, 'estado', ev.target.value)}>
+                    <select style={{ ...s.tag, background: ESTADOS[c.estado]?.bg, color: ESTADOS[c.estado]?.color }} value={c.estado} onChange={ev => actualizarCampo(c.id, 'estado', ev.target.value)}>
                       {Object.keys(ESTADOS).map(est => <option key={est}>{est}</option>)}
                     </select>
                   </td>
-                  <td style={s.td}><button style={s.btnDelete} onClick={() => eliminar(e.id)}>🗑</button></td>
+                  <td style={s.td}><button style={s.btnDelete} onClick={() => eliminar(c.id)}>🗑</button></td>
                 </tr>
               ))}
             </tbody>

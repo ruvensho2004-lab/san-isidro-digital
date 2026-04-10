@@ -11,4 +11,4 @@ RUN npx prisma generate
 ENV PORT=3001
 EXPOSE 3001
 
-CMD ["node", "src/index.js"]
+CMD ["sh", "-c", "npx prisma db push && node src/index.js"]

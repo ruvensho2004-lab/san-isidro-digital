@@ -27,9 +27,9 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { nombre, telefono, tipo, descripcion } = req.body
+    const { nombre, telefono, cedula, tipo, descripcion } = req.body
     const solicitud = await req.prisma.solicitud.create({
-      data: { nombre, telefono, tipo, descripcion }
+      data: { nombre, telefono, cedula, tipo, descripcion }
     })
     res.status(201).json(solicitud)
   } catch (error) {
@@ -39,10 +39,19 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { estado } = req.body
+    const { estado, nombre, telefono, cedula, tipo, descripcion } = req.body
+    
+    const dataToUpdate = {}
+    if (estado !== undefined) dataToUpdate.estado = estado
+    if (nombre !== undefined) dataToUpdate.nombre = nombre
+    if (telefono !== undefined) dataToUpdate.telefono = telefono
+    if (cedula !== undefined) dataToUpdate.cedula = cedula
+    if (tipo !== undefined) dataToUpdate.tipo = tipo
+    if (descripcion !== undefined) dataToUpdate.descripcion = descripcion
+
     const solicitud = await req.prisma.solicitud.update({
       where: { id: parseInt(req.params.id) },
-      data: { estado }
+      data: dataToUpdate
     })
     res.json(solicitud)
   } catch (error) {

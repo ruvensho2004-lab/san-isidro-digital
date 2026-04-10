@@ -7,19 +7,21 @@ const TIPOS = ['Trámite Administrativo', 'Ayuda Social', 'Reclamo de Servicio',
 const ESTADOS = {
   'Pendiente': { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24' },
   'En Proceso': { bg: 'rgba(56,189,248,0.15)', color: '#38bdf8' },
-  'Resuelto': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' }
+  'Resuelto': { bg: 'rgba(52,211,153,0.15)', color: '#34d399' },
+  'Cerrada': { bg: 'rgba(239,68,68,0.15)', color: '#ef4444' }
 }
 
 const columnas = [
   { header: '#', accessor: (_, i) => i + 1 },
   { header: 'Ciudadano', accessor: item => item.nombre },
+  { header: 'Cédula', accessor: item => item.cedula || '—' },
   { header: 'Tipo', accessor: item => item.tipo },
   { header: 'Descripción', accessor: item => item.descripcion },
   { header: 'Estado', accessor: item => item.estado },
   { header: 'Fecha', accessor: item => new Date(item.fecha).toLocaleDateString() },
 ]
 
-const formVacio = { nombre: '', telefono: '', tipo: 'Trámite Administrativo', descripcion: '' }
+const formVacio = { nombre: '', cedula: '', telefono: '', tipo: 'Trámite Administrativo', descripcion: '' }
 
 export default function Solicitudes() {
   const [solicitudes, setSolicitudes] = useState([])
@@ -52,7 +54,7 @@ export default function Solicitudes() {
 
   function abrirEditar(sol) {
     setEditando(sol.id)
-    setForm({ nombre: sol.nombre, telefono: sol.telefono || '', tipo: sol.tipo, descripcion: sol.descripcion })
+    setForm({ nombre: sol.nombre, cedula: sol.cedula || '', telefono: sol.telefono || '', tipo: sol.tipo, descripcion: sol.descripcion })
     setMostrarForm(true)
   }
 
@@ -63,8 +65,11 @@ export default function Solicitudes() {
   }
 
   async function guardar() {
-    if (!form.nombre.trim() || !form.descripcion.trim()) {
-      mostrarNotif('⚠️ Completa los campos requeridos'); return
+    if (!form.nombre || !form.nombre.trim()) {
+      mostrarNotif('⚠️ Debes ingresar el Nombre'); return
+    }
+    if (!form.descripcion || !form.descripcion.trim()) {
+      mostrarNotif('⚠️ Debes ingresar una Descripción'); return
     }
     try {
       if (editando) {
@@ -154,11 +159,17 @@ export default function Solicitudes() {
               <input style={s.input} name="telefono" value={form.telefono} onChange={handleChange} placeholder="0412-..." />
             </div>
           </div>
-          <div style={s.formGroup}>
-            <label style={s.label}>Tipo *</label>
-            <select style={s.input} name="tipo" value={form.tipo} onChange={handleChange}>
-              {TIPOS.map(t => <option key={t}>{t}</option>)}
-            </select>
+          <div style={s.formRow}>
+            <div style={s.formGroup}>
+              <label style={s.label}>Cédula</label>
+              <input style={s.input} name="cedula" value={form.cedula} onChange={handleChange} placeholder="Ej: 12345678" />
+            </div>
+            <div style={s.formGroup}>
+              <label style={s.label}>Tipo *</label>
+              <select style={s.input} name="tipo" value={form.tipo} onChange={handleChange}>
+                {TIPOS.map(t => <option key={t}>{t}</option>)}
+              </select>
+            </div>
           </div>
           <div style={s.formGroup}>
             <label style={s.label}>Descripción *</label>
@@ -177,16 +188,17 @@ export default function Solicitudes() {
         ) : (
           <table style={s.table}>
             <thead>
-              <tr>{['#', 'Ciudadano', 'Teléfono', 'Tipo', 'Estado', ...(isAdmin ? ['Acciones'] : [])].map(h => <th key={h} style={s.th}>{h}</th>)}</tr>
+              <tr>{['#', 'Ciudadano', 'Cédula', 'Teléfono', 'Tipo', 'Estado', ...(isAdmin ? ['Acciones'] : [])].map(h => <th key={h} style={s.th}>{h}</th>)}</tr>
             </thead>
             <tbody>
               {solicitudesFiltradas.map((sol, i) => (
                 <tr key={sol.id}>
-                  <td style={{ ...s.td, color: '#6b61a0', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
+                  <td style={{ ...s.td, color: '#a78bfa', fontFamily: 'monospace' }}>{String(i + 1).padStart(3, '0')}</td>
                   <td style={s.td}>
                     <div style={{ fontWeight: 600 }}>{sol.nombre}</div>
-                    <div style={{ fontSize: 11, color: '#6b61a0', marginTop: 2 }}>{sol.descripcion.slice(0, 50)}{sol.descripcion.length > 50 ? '...' : ''}</div>
+                    <div style={{ fontSize: 11, color: '#a89fc7', marginTop: 2 }}>{sol.descripcion.slice(0, 50)}{sol.descripcion.length > 50 ? '...' : ''}</div>
                   </td>
+                  <td style={s.td}>{sol.cedula || '—'}</td>
                   <td style={s.td}>{sol.telefono || '—'}</td>
                   <td style={s.td}>{sol.tipo}</td>
                   <td style={s.td}>
@@ -219,24 +231,24 @@ export default function Solicitudes() {
 
 const s = {
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 },
-  titulo: { fontSize: 18, fontWeight: 700, color: '#e8e4ff' },
+  titulo: { fontSize: 22, fontWeight: 700, color: '#e8e4ff' },
   actions: { display: 'flex', gap: 8, flexWrap: 'wrap' },
   filtrosRow: { display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' },
-  btnPrimary: { background: 'linear-gradient(135deg,#7c5cfc,#4f3bb8)', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 16px rgba(124,92,252,0.3)' },
-  btnExport: { background: 'rgba(52,211,153,0.15)', color: '#34d399', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-  btnCancelar: { background: 'transparent', color: '#a89fc7', border: '1px solid rgba(120,100,255,0.3)', borderRadius: 10, padding: '10px 18px', fontSize: 13, cursor: 'pointer' },
-  btnEdit: { background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 6, cursor: 'pointer', fontSize: 14, padding: '4px 8px' },
+  btnPrimary: { background: 'linear-gradient(135deg, #7c5cfc, #4f3bb8)', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 10px rgba(124,92,252,0.3)' },
+  btnExport: { background: '#252048', color: '#a89fc7', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+  btnCancelar: { background: 'transparent', color: '#a89fc7', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 10, padding: '10px 18px', fontSize: 13, cursor: 'pointer' },
+  btnEdit: { background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', color: '#38bdf8', borderRadius: 6, cursor: 'pointer', fontSize: 13, padding: '4px 8px' },
   btnDelete: { background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 16 },
-  panel: { background: '#1e1a3a', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 16, padding: 22, marginBottom: 16, overflowX: 'auto' },
-  panelTitle: { fontSize: 14, fontWeight: 700, color: '#e8e4ff', marginBottom: 16 },
+  panel: { background: '#1e1a3a', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 16, padding: 22, marginBottom: 16, overflowX: 'auto', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' },
+  panelTitle: { fontSize: 16, fontWeight: 700, color: '#e8e4ff', marginBottom: 16 },
   formRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 },
   formGroup: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 10, fontWeight: 600, color: '#a89fc7', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
-  input: { width: '100%', background: '#1a1638', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 10, color: '#e8e4ff', fontSize: 13, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' },
+  label: { display: 'block', fontSize: 11, fontWeight: 700, color: '#a89fc7', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
+  input: { width: '100%', background: '#13102a', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 10, color: '#e8e4ff', fontSize: 13, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 500 },
-  th: { textAlign: 'left', padding: '10px 14px', color: '#6b61a0', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid rgba(120,100,255,0.18)', whiteSpace: 'nowrap' },
-  td: { padding: '12px 14px', color: '#e8e4ff', borderBottom: '1px solid rgba(120,100,255,0.06)', fontSize: 13 },
-  tag: { padding: '4px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer' },
-  empty: { textAlign: 'center', color: '#6b61a0', padding: 30 },
-  notif: { position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: '#252048', border: '1px solid #7c5cfc', borderRadius: 12, padding: '14px 18px', fontSize: 13, color: '#e8e4ff', zIndex: 9999 },
+  th: { textAlign: 'left', padding: '10px 14px', color: '#a89fc7', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid rgba(120,100,255,0.18)', whiteSpace: 'nowrap' },
+  td: { padding: '12px 14px', color: '#e8e4ff', borderBottom: '1px solid rgba(120,100,255,0.08)', fontSize: 13 },
+  tag: { padding: '4px 8px', borderRadius: 6, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer' },
+  empty: { textAlign: 'center', color: '#a89fc7', padding: 30 },
+  notif: { position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: '#252048', border: '1px solid #7c5cfc', borderRadius: 12, padding: '14px 18px', fontSize: 13, color: '#fff', zIndex: 9999, boxShadow: '0 10px 25px rgba(0,0,0,0.5)' },
 }

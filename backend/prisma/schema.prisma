@@ -10,6 +10,7 @@ datasource db {
 model Solicitud {
   id          Int      @id @default(autoincrement())
   nombre      String
+  cedula      String?
   telefono    String?
   tipo        String
   descripcion String
@@ -19,26 +20,30 @@ model Solicitud {
 }
 
 model RecursoClap {
-  id           Int      @id @default(autoincrement())
-  nombre       String
-  cedula       String
-  tipo         String
-  cantidad     Int      @default(1)
+  id            Int      @id @default(autoincrement())
+  nombre        String
+  cedula        String
+  tipo          String
+  cantidad      Int      @default(1)
   observaciones String?
-  fecha        DateTime @default(now())
-  actualizado  DateTime @updatedAt
+  estado        String   @default("Pendiente")
+  pagado        Boolean  @default(false)
+  fecha         DateTime @default(now())
+  actualizado   DateTime @updatedAt
 }
 
 model Emprendimiento {
-  id          Int      @id @default(autoincrement())
-  nombre      String
-  responsable String
-  categoria   String
-  descripcion String
-  estado      String   @default("Activo")
-  inversion   Decimal?
-  fecha       DateTime @default(now())
-  actualizado DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  nombre           String
+  cedula           String?
+  responsable      String
+  categoria        String
+  descripcion      String
+  cumpleRequisitos Boolean  @default(false)
+  estado           String   @default("Pendiente")
+  inversion        Decimal?
+  fecha            DateTime @default(now())
+  actualizado      DateTime @updatedAt
 }
 
 model Proyecto {
@@ -47,6 +52,7 @@ model Proyecto {
   descripcion String
   tipo        String
   sector      String
+  presupuesto Decimal? @default(0)
   estado      String   @default("En Planificación")
   fecha       DateTime @default(now())
   actualizado DateTime @updatedAt
@@ -74,4 +80,49 @@ model Usuario {
   direccion String?
   activo    Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+model GasComunal {
+  id          Int      @id @default(autoincrement())
+  responsable String
+  cedula      String
+  tamano      String   // "10Kg", "18Kg", "27Kg", "43Kg"
+  cantidad    Int      @default(1)
+  estado      String   @default("Pendiente") // Pendiente, Entregado, Vacío
+  pagado      Boolean  @default(false)
+  fecha       DateTime @default(now())
+  actualizado DateTime @updatedAt
+}
+
+model Asamblea {
+  id          Int      @id @default(autoincrement())
+  motivo      String
+  fecha       DateTime @default(now())
+  asistentes  Int      @default(0)
+  acuerdos    String
+  vocero      String?
+  enlaceActa  String?
+  actualizado DateTime @updatedAt
+}
+
+model CasoSalud {
+  id          Int      @id @default(autoincrement())
+  paciente    String
+  cedula      String?
+  diagnostico String
+  ayudaReq    String
+  estado      String   @default("Revisión") // Revisión, Atendido, Rechazado
+  prioridad   String   @default("Normal")   // Normal, Alta, Emergencia
+  fecha       DateTime @default(now())
+  actualizado DateTime @updatedAt
+}
+
+model Noticia {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  contenido   String
+  tipo        String   @default("General") // Asamblea, Salud, General, Alerta
+  activa      Boolean  @default(true)
+  fecha       DateTime @default(now())
+  actualizado DateTime @updatedAt
 }

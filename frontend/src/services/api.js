@@ -1,4 +1,4 @@
-const API = 'https://san-isidro-digital.onrender.com/api'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 function getToken() {
   return localStorage.getItem('token')
@@ -46,6 +46,7 @@ export const api = {
   clap: {
     list: () => request('/clap'),
     create: (data) => request('/clap', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/clap/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     delete: (id) => request(`/clap/${id}`, { method: 'DELETE' }),
   },
   emprendimientos: {
@@ -65,4 +66,35 @@ export const api = {
     create: (data) => request('/beneficiarios', { method: 'POST', body: JSON.stringify(data) }),
     delete: (id) => request(`/beneficiarios/${id}`, { method: 'DELETE' }),
   },
+  gas: {
+    list: () => request('/gas'),
+    create: (data) => request('/gas', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/gas/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id) => request(`/gas/${id}`, { method: 'DELETE' })
+  },
+  asambleas: {
+    list: () => request('/asambleas'),
+    create: (data) => request('/asambleas', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/asambleas/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id) => request(`/asambleas/${id}`, { method: 'DELETE' })
+  },
+  salud: {
+    list: () => request('/salud'),
+    create: (data) => request('/salud', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/salud/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id) => request(`/salud/${id}`, { method: 'DELETE' })
+  },
+  noticias: {
+    listPublic: () => fetch(`${API}/noticias/public`).then(r => r.json()),
+    list: () => request('/noticias'),
+    create: (data) => request('/noticias', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/noticias/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id) => request(`/noticias/${id}`, { method: 'DELETE' })
+  },
+  ai: {
+    chat: (data) => request('/ai/chat', { method: 'POST', body: JSON.stringify(data) })
+  },
+  public: {
+    chat: (data) => fetch(`${API}/public/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(r => r.json())
+  }
 }

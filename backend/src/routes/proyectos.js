@@ -15,9 +15,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { titulo, descripcion, tipo, sector, estado } = req.body
+    const { titulo, descripcion, tipo, sector, estado, presupuesto } = req.body
     const proyecto = await req.prisma.proyecto.create({
-      data: { titulo, descripcion, tipo, sector, estado }
+      data: { titulo, descripcion, tipo, sector, estado, presupuesto }
     })
     res.status(201).json(proyecto)
   } catch (error) {
@@ -27,13 +27,14 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { estado, titulo, descripcion, tipo, sector } = req.body
+    const { estado, titulo, descripcion, tipo, sector, presupuesto } = req.body
     const data = {}
     if (estado !== undefined) data.estado = estado
     if (titulo !== undefined) data.titulo = titulo
     if (descripcion !== undefined) data.descripcion = descripcion
     if (tipo !== undefined) data.tipo = tipo
     if (sector !== undefined) data.sector = sector
+    if (presupuesto !== undefined) data.presupuesto = presupuesto
 
     const proyecto = await req.prisma.proyecto.update({
       where: { id: parseInt(req.params.id) },
