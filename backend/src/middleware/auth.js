@@ -34,8 +34,9 @@ export function authMiddleware(req, res, next) {
 }
 
 export function adminOnly(req, res, next) {
-  if (req.user?.rol !== 'admin') {
-    return res.status(403).json({ error: 'Acceso solo para administradores' })
+  const rol = req.user?.rol?.toLowerCase();
+  if (rol !== 'admin' && rol !== 'administrador') {
+    return res.status(403).json({ error: `Acceso solo para administradores. Rol detectado: ${req.user?.rol}` })
   }
   next()
 }

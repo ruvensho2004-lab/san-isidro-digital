@@ -29,15 +29,16 @@ export default function Layout() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#0d0b1a', color: '#e8e4ff', fontFamily: "'Sora', sans-serif" }}>
+    <div className="app-layout" style={{ display: 'flex', height: '100vh', background: '#0d0b1a', color: '#e8e4ff', fontFamily: "'Sora', sans-serif" }}>
       {/* Sidebar Dark/Purple */}
-      <aside style={{ width: 260, background: '#13102a', borderRight: '1px solid rgba(120,100,255,0.18)', display: 'flex', flexDirection: 'column', flexShrink: 0, boxShadow: '2px 0 10px rgba(0,0,0,0.2)' }}>
+      <aside className={`app-sidebar ${menuOpen ? 'open' : ''}`} style={{ width: 260, background: '#13102a', borderRight: '1px solid rgba(120,100,255,0.18)', display: 'flex', flexDirection: 'column', flexShrink: 0, boxShadow: '2px 0 10px rgba(0,0,0,0.2)', zIndex: 50 }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #7c5cfc, #38bdf8)' }} />
-        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(120,100,255,0.18)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(135deg, #7c5cfc, #4f3bb8)', borderRadius: 12, padding: '10px 14px', marginBottom: 12, boxShadow: '0 4px 15px rgba(124,92,252,0.3)' }}>
+        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(120,100,255,0.18)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(135deg, #7c5cfc, #4f3bb8)', borderRadius: 12, padding: '10px 14px', marginBottom: 0, boxShadow: '0 4px 15px rgba(124,92,252,0.3)', flex: 1 }}>
             <span style={{ fontSize: 24 }}>🏛️</span>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#ffffff', lineHeight: 1.2 }}>San Isidro<br/>Digital</div>
           </div>
+          <button className="mobile-menu-btn" onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#a89fc7', fontSize: 28, cursor: 'pointer', marginLeft: 10 }}>×</button>
         </div>
 
         <nav style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
@@ -48,6 +49,7 @@ export default function Layout() {
                 <NavLink
                   key={item.to}
                   to={item.to}
+                  onClick={() => { if(window.innerWidth <= 768) setMenuOpen(false) }}
                   end={item.to === '/'}
                   style={({ isActive }) => ({
                     display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 10, cursor: 'pointer', color: '#a89fc7', fontSize: 13, fontWeight: 600, textDecoration: 'none', transition: 'all .2s', marginBottom: 2,
@@ -73,12 +75,17 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header */}
         <div style={{ padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(120,100,255,0.18)', flexShrink: 0, background: 'rgba(13,11,26,0.8)', backdropFilter: 'blur(12px)' }}>
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#e8e4ff' }}>San Isidro Digital</div>
-            <div style={{ fontSize: 12, color: '#a89fc7', marginTop: 2 }}>Plataforma Integral de Gestión Comunal</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button className="mobile-menu-btn" onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', color: '#e8e4ff', fontSize: 24, cursor: 'pointer' }}>
+              ☰
+            </button>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: '#e8e4ff' }}>San Isidro Digital</div>
+              <div className="mobile-hide" style={{ fontSize: 12, color: '#a89fc7', marginTop: 2 }}>Plataforma Integral de Gestión Comunal</div>
+            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button style={{ background: '#1e1a3a', border: '1px solid rgba(120,100,255,0.18)', borderRadius: 20, color: '#e8e4ff', fontSize: 12, fontWeight: 600, padding: '7px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }} onClick={() => navigate('/perfil')}>

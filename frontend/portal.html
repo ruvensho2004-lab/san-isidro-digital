@@ -51,14 +51,20 @@
     .stats { gap: 40px; }
     .hero-title { font-size: 44px; }
   }
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     .features { grid-template-columns: 1fr; }
-    .hero-title { font-size: 36px; }
+    .hero-title { font-size: 32px; padding: 0 10px; }
+    .hero-subtitle { font-size: 16px; padding: 0 10px; }
     .stats { gap: 20px; flex-direction: column; }
     .contact-form { grid-template-columns: 1fr; }
     .contact-form textarea { grid-column: span 1; }
     .contact-form button { grid-column: span 1; }
-    .portal-header { flex-direction: column; gap: 16px; text-align: center; }
+    .portal-header { flex-direction: column; gap: 16px; text-align: center; padding: 20px; }
+    .hero-content { padding: 40px 20px; }
+    .consulta-form { flex-direction: column; }
+    .public-chat { width: calc(100vw - 40px); right: 20px; bottom: 80px; height: 75vh; }
+    .float-bot { bottom: 20px; right: 20px; width: 55px; height: 55px; font-size: 24px; }
+    .login-box { padding: 30px 20px; width: 90%; }
   }
   
   /* FLOATING AI BOT */
@@ -418,7 +424,8 @@
 // Cambia esta variable a la URL de tu backend en producción (ej. https://sanisidro-backend.onrender.com)
 const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
   ? 'http://localhost:3001'
-  : 'AQUI_PON_LA_URL_DE_PRODUCCION';
+  : 'https://san-isidro-digital-production.up.railway.app';
+
 
 // FIN DATA
 

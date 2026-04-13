@@ -28,3 +28,33 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #4f3bb8;
 }
+
+/* RESPONSIVE LAYOUT */
+.mobile-menu-btn { display: none !important; }
+
+@media (max-width: 768px) {
+  .mobile-menu-btn { display: block !important; }
+  .mobile-hide { display: none !important; }
+  
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    bottom: 0;
+    transition: left 0.3s ease;
+  }
+  
+  .app-sidebar.open {
+    left: 0;
+  }
+  
+  .app-main > div:last-child {
+    padding: 16px 12px !important;
+  }
+
+  /* FORZAR FORMULARIOS A 1 COLUMNA EN CELULARES INDEPENDIENTEMENTE DEL JS */
+  div[style*="1fr 1fr"] { grid-template-columns: 1fr !important; }
+  
+  /* PERMITIR SCROLL HORIZONTAL EN TODAS LAS TABLAS QUE SE DESBORDEN */
+  div[style*="1e1a3a"] { overflow-x: auto !important; }
+}
