@@ -14,17 +14,47 @@ const LIMITES = {
   'Largo (Detallado)': 1000
 }
 
+const ENFOQUES = {
+  'Atención Ciudadana (General)': 'Enfócate en resolver dudas comunes de la comunidad, trámites, servicios públicos y convivencia ciudadana.',
+  'Asesor Legal Comunal': 'Asume el rol de un experto legal en materia de leyes del poder popular, estatutos de consejos comunales y normas jurídicas venezolanas.',
+  'Analista de Proyectos y Emprendimientos': 'Focalízate en números, viabilidad técnica, presupuestos, metodologías de proyectos y consejos para emprendedores.'
+}
+
+const MODELOS = {
+  'Llama 3.1 (8B) - Instantáneo': 'llama-3.1-8b-instant',
+  'Llama 3.3 (70B) - Versátil': 'llama-3.3-70b-versatile',
+  'Mixtral (8x7B) - Analítico': 'mixtral-8x7b-32768'
+}
+
+const CREATIVIDAD = {
+  'Equilibrado (0.6)': 0.6,
+  'Preciso (0.2)': 0.2,
+  'Creativo (0.9)': 0.9
+}
+
+
 router.post('/chat', async (req, res) => {
   try {
-    const { messages, personalidad, limiteTexto, memoriaContextual } = req.body;
+    const { messages, personalidad, limiteTexto, memoriaContextual, modelo, creatividad, enfoque, instruccionExtra } = req.body;
 
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return res.status(500).json({ error: 'LLave API de Groq no configurada en el servidor (GROQ_API_KEY).' });
     }
 
-    const systemPrompt = PERSONALIDADES[personalidad] || PERSONALIDADES['Empático (Por defecto)'];
+    let systemPrompt = PERSONALIDADES[personalidad] || PERSONALIDADES['Empático (Por defecto)'];
+    
+    if (ENFOQUES[enfoque]) {
+      systemPrompt += '\n\nEspecialidad: ' + ENFOQUES[enfoque];
+    }
+    
+    if (instruccionExtra && instruccionExtra.trim().length > 0) {
+      systemPrompt += '\n\nINSTRUCCIONES EXTRA ESTRICTAS DEL ADMINISTRADOR:\n' + instruccionExtra.trim();
+    }
+
     const maxTokens = LIMITES[limiteTexto] || LIMITES['Normal (Equilibrado)'];
+    const modelId = MODELOS[modelo] || MODELOS['Llama 3.1 (8B) - Instantáneo'];
+    const tempValue = CREATIVIDAD[creatividad] !== undefined ? CREATIVIDAD[creatividad] : 0.6;
 
     let sendMessages = [];
     sendMessages.push({ role: 'system', content: systemPrompt });
@@ -51,10 +81,10 @@ router.post('/chat', async (req, res) => {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: modelId,
         messages: sendMessages,
         max_tokens: maxTokens,
-        temperature: personalidad === 'Formal y Directo' ? 0.2 : 0.7
+        temperature: tempValue
       })
     });
 

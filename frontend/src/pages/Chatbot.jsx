@@ -21,9 +21,13 @@ export default function Chatbot() {
   const [showConfig, setShowConfig] = useState(false)
   
   // Configuracion de IA
+  const [modelo, setModelo] = useState('Llama 3.1 (8B) - Instantáneo')
   const [personalidad, setPersonalidad] = useState('Empático (Por defecto)')
+  const [enfoque, setEnfoque] = useState('Atención Ciudadana (General)')
+  const [creatividad, setCreatividad] = useState('Equilibrado (0.6)')
   const [limiteTexto, setLimiteTexto] = useState('Normal (Equilibrado)')
   const [memoriaContextual, setMemoriaContextual] = useState(true)
+  const [instruccionExtra, setInstruccionExtra] = useState('')
 
   const bottomRef = useRef(null)
 
@@ -54,7 +58,11 @@ export default function Chatbot() {
         messages: nuevosMensajes,
         personalidad,
         limiteTexto,
-        memoriaContextual
+        memoriaContextual,
+        modelo,
+        creatividad,
+        enfoque,
+        instruccionExtra
       })
       setMensajes([...nuevosMensajes, { rol: 'bot', texto: reply }])
     } catch (error) {
@@ -96,14 +104,38 @@ export default function Chatbot() {
       {/* Panel de Configuración Real */}
       {showConfig && (
         <div style={s.configPanel}>
-          <div style={s.confTitle}>Parámetros del Motor de IA</div>
+          <div style={s.confTitle}>Parámetros Avanzados del Motor de IA</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div>
+              <label style={s.confLabel}>Motor de IA (Modelo)</label>
+              <select style={s.confSelect} value={modelo} onChange={e=>setModelo(e.target.value)}>
+                <option>Llama 3.1 (8B) - Instantáneo</option>
+                <option>Llama 3.3 (70B) - Versátil</option>
+                <option>Mixtral (8x7B) - Analítico</option>
+              </select>
+            </div>
+            <div>
+              <label style={s.confLabel}>Especialidad (Enfoque)</label>
+              <select style={s.confSelect} value={enfoque} onChange={e=>setEnfoque(e.target.value)}>
+                <option>Atención Ciudadana (General)</option>
+                <option>Asesor Legal Comunal</option>
+                <option>Analista de Proyectos y Emprendimientos</option>
+              </select>
+            </div>
             <div>
               <label style={s.confLabel}>Personalidad / Tono</label>
               <select style={s.confSelect} value={personalidad} onChange={e => setPersonalidad(e.target.value)}>
                 <option>Empático (Por defecto)</option>
                 <option>Formal y Directo</option>
                 <option>Informativo Extendido</option>
+              </select>
+            </div>
+            <div>
+              <label style={s.confLabel}>Nivel de Creatividad</label>
+              <select style={s.confSelect} value={creatividad} onChange={e=>setCreatividad(e.target.value)}>
+                <option>Equilibrado (0.6)</option>
+                <option>Preciso (0.2)</option>
+                <option>Creativo (0.9)</option>
               </select>
             </div>
             <div>
@@ -115,7 +147,7 @@ export default function Chatbot() {
               </select>
             </div>
             <div>
-              <label style={s.confLabel}>Memoria Contextual (Chat Tracking)</label>
+              <label style={s.confLabel}>Memoria Contextual (Chat)</label>
               <div 
                 style={{...s.toggle, cursor:'pointer'}} 
                 onClick={() => setMemoriaContextual(!memoriaContextual)}
@@ -124,12 +156,20 @@ export default function Chatbot() {
                 <span style={{ color: memoriaContextual ? '#34d399' : '#ef4444' }}>{memoriaContextual ? '🟢' : '🔴'}</span>
               </div>
             </div>
-            <div>
-              <label style={s.confLabel}>Acción Adicional</label>
-              <button style={s.btnConfig} onClick={reiniciarChat} style={{width:'100%', borderColor:'#ef4444', color:'#ef4444', background:'transparent'}}>🗑 Borrar Memoria Ahora</button>
-            </div>
           </div>
-          <button style={s.confSaveBtn} onClick={() => setShowConfig(false)}>Cerrar Panel</button>
+          <div style={{ marginTop: 16 }}>
+            <label style={s.confLabel}>Instrucciones Base Manuales (Opcional)</label>
+            <textarea 
+              style={{...s.confSelect, minHeight: 60, resize:'vertical', fontFamily: 'monospace', fontSize: 12}} 
+              placeholder="Ej: Contesta únicamente hablando en rimas... (Dejar en blanco para usar el enfoque automático)"
+              value={instruccionExtra}
+              onChange={e => setInstruccionExtra(e.target.value)}
+            />
+          </div>
+          <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
+            <button style={{...s.confSaveBtn, marginTop: 0, flex: 1}} onClick={() => setShowConfig(false)}>Cerrar y Aplicar</button>
+            <button style={{...s.confSaveBtn, marginTop: 0, width: 'auto', background: 'transparent', border: '1px solid rgba(239,68,68,0.5)', color: '#ef4444'}} onClick={reiniciarChat}>🗑 Borrar Memoria</button>
+          </div>
         </div>
       )}
 
